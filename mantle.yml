@@ -1,0 +1,26 @@
+environments:
+  - label: dev
+    targetNamePrefix: environmentLabel
+  - label: prod
+    targetAccess: public
+
+target:
+  experience:
+    configuration:
+      genre: all
+      playableDevices: [computer, phone, tablet]
+      enableStudioAccessToApis: true
+      privateServers: free
+      avatarType: r6
+    places:
+      start:
+        file: build.rbxlx
+        configuration:
+          name: ivy's peppers
+          maxPlayerCount: 25
+          serverFill: robloxOptimized
+          description: |-
+            pick pepper, do game
+    assets:
+      - assets/images/icons/pepper.png
+      - assets/images/card_background.png
