@@ -2,29 +2,30 @@ name: dev-deploy
 on: push
 jobs:
   build-and-deploy:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Code Checkout
-      uses: actions/checkout@v2
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
 
-    - name: Install NodeJS
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ env.NODE_VERSION }}
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-    - name: Install Dependencies
-      run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-    - name: Setup Aftman
-      uses: ok-nick/setup-aftman@v0.4.2
+      - name: Setup Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
 
-    - name: Build Typescript
-      run: npm run build
+      - name: Build Typescript
+        run: npm run build
 
-    - name: Build Rojo
-      run: rojo build --output build.rbxlx
+      - name: Build Rojo
+        run: rojo build --output build.rbxlx
 
-    - name: Deploy Dev
-      run: mantle deploy --environment dev
-      env:
-        ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
+      - name: Deploy Dev
+        run: mantle deploy --environment dev
+        env:
+          ROBLOSECURITY: ${{ secrets.ROBLOSECURITY }}
