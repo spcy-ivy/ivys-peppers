@@ -2,7 +2,7 @@ import { PepperDefinition } from "types/interfaces/Peppers";
 
 export const Tabasco: PepperDefinition = {
 	option: {
-		icon: "rbxgameasset://Images/pepper",
+		icon: "rbxgameasset://Images/tabasco",
 		name: "tabasco",
 		description: "not the sauce. half health, no jump, high speed!",
 	},

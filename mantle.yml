@@ -22,5 +22,5 @@ target:
           description: |-
             pick pepper, do game
     assets:
-      - assets/images/icons/pepper.png
+      - assets/images/icons/tabasco.png
       - assets/images/card_background.png
