@@ -6,7 +6,7 @@ Log.SetLogger(Logger.configure().WriteTo(Zircon.Log.Console()).Create());
 // Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
 
 Modding.registerDependency<Logger>((ctor) => {
-  return Log.ForContext(ctor);
+	return Log.ForContext(ctor);
 });
 
 Flamework.addPaths("src/server/components");

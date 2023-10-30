@@ -5,7 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "rbxtsc",
-    "watch": "rbxtsc -w"
+    "watch": "rbxtsc -w",
+
+    "lint": "npx eslint src",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "npx prettier src --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +28,7 @@
     "prettier": "^2.3.2",
     "rbxts-transformer-flamework": "=1.0.0-beta.24",
     "roblox-ts": "^2.2.0",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {
