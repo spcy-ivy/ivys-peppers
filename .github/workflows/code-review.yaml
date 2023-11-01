@@ -16,8 +16,5 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Fix Attempt
-        run: npm run format
-
       - name: Lint Normal Files
         run: npm run lint

@@ -1,7 +1,22 @@
-# Ivy's Peppers
+# ivy's Peppers
 dont get confused when I use react shit with @rbxts/roact its based off of [this](https://github.com/littensy/rbxts-react-example/) and apparently its to avoid conflicts w/ rbxts compiler
 
-# Credits
+# tools
+## the game itself
+- [rbxts](https://roblox-ts.com/) is the transpiler for typescript to luau
+- [flamework](https://fireboltofdeath.dev/docs/flamework/) is the framework for rbxts. using their core and networking modules too
+- [beacon](https://www.npmjs.com/package/@rbxts/beacon) for signal pattern
+- [janitor](https://howmanysmall.github.io/Janitor/) for maid/janitor pattern
+- [zircon](https://zircon.australis.dev/) for logging/debugging/commands
+- [promise-character](https://www.npmjs.com/package/@rbxts/promise-character) for handling all the character typing shit for me
+- [react-ts](https://github.com/littensy/rbxts-react) for react in the block
+- [ripple](https://www.npmjs.com/package/@rbxts/ripple) for motion :)
+- [rust-classes](https://www.npmjs.com/package/@rbxts/rust-classes) for rust classes :)
+
+## other workflow shit
+- [gh](https://cli.github.com/) for some github cli shit
+
+# credits
 <div align="center">
     <p>cuz i cant do this alone lmao</p>
     <table>
