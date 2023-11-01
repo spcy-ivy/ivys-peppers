@@ -151,23 +151,15 @@ export function Cards({
 	const delay = 0.05;
 
 	useEffect(() => {
-		if (enabled) {
-			firstMotion.spring(0, springs.gentle);
-			task.defer(() => {
-				task.wait(delay);
-				secondMotion.spring(0, springs.gentle);
-				task.wait(delay);
-				thirdMotion.spring(0, springs.gentle);
-			});
-		} else {
-			firstMotion.spring(1, springs.responsive);
-			task.defer(() => {
-				task.wait(delay);
-				secondMotion.spring(1, springs.gentle);
-				task.wait(delay);
-				thirdMotion.spring(1, springs.gentle);
-			});
-		}
+		const transparency = enabled ? 0 : 1;
+
+		firstMotion.spring(transparency, springs.gentle);
+		task.defer(() => {
+			task.wait(delay);
+			secondMotion.spring(transparency, springs.gentle);
+			task.wait(delay);
+			thirdMotion.spring(transparency, springs.gentle);
+		});
 	}, [enabled]);
 
 	return (

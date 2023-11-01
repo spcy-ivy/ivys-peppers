@@ -1,6 +1,12 @@
 # Ivy's Peppers
 dont get confused when I use react shit with @rbxts/roact its based off of [this](https://github.com/littensy/rbxts-react-example/) and apparently its to avoid conflicts w/ rbxts compiler
 
+# TODO
+- [ ] add reflex state management
+- [ ] add survivors store
+- [ ] create dedicated zircon commands to affect that
+- [ ] manipulate store before running gamemode
+
 # Credits
 <div align="center">
     <p>cuz i cant do this alone lmao</p>

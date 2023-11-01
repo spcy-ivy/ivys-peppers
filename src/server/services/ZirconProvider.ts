@@ -14,6 +14,7 @@ export class ZirconProvider implements OnInit {
 				.AddFunction(this.TestGamemode, [ZirconDefaultGroup.Creator])
 				.AddFunction(this.StopGamemode, [ZirconDefaultGroup.Creator])
 				.AddFunction(this.Announce, [ZirconDefaultGroup.Creator])
+				.AddFunction(this.TestPepper, [ZirconDefaultGroup.Creator])
 				//.AddFunction(this.PepperPrompt, [ZirconDefaultGroup.Creator])
 				.Build(),
 		);
@@ -30,6 +31,10 @@ export class ZirconProvider implements OnInit {
 	private Announce = new ZirconFunctionBuilder("announce")
 		.AddArgument("string")
 		.Bind((_context, message) => Events.announce.broadcast(message));
+
+	private TestPepper = new ZirconFunctionBuilder("test_pepper")
+		.AddArgument("string")
+		.Bind((context, pepper) => this.roundManager.ApplyPepper(context.GetExecutor(), pepper));
 
 	// private PepperPrompt = new ZirconFunctionBuilder("pepper_prompt").Bind((_context) =>
 	// Events.pepper_prompt.broadcast(),
