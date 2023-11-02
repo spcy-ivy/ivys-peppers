@@ -2,26 +2,32 @@ import { Service } from "@flamework/core";
 import { Logger } from "@rbxts/log";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Option } from "@rbxts/rust-classes";
+import { Events } from "server/network";
 import { gamemodes } from "server/gamemodes";
 import { peppers } from "server/peppers";
 
 /**
- * 1. get gamemode
+ * 1. [x] get gamemode
  *   - [x] gamemode activation/selection
  *   - [x] gamemode cancellation
  *   - [x] announcements
  * 2. pepper prompt
- * 3. load gamemode
- * 4. load pepper shit
- * 5. wait until win condition (w/ promises)
+ * 3. [x] load gamemode
+ * 4. [x] load pepper shit
+ * 5. [x] wait until win condition (w/ promises)
  */
 
 @Service()
 export class RoundManager {
 	private winCondition: Option<Promise<unknown>>;
+	private pepperNames: string[] = [];
 
 	public constructor(private readonly logger: Logger) {
 		this.winCondition = Option.none();
+
+		for (const [key, _value] of pairs(peppers)) {
+			this.pepperNames.push(key);
+		}
 	}
 
 	StartRound() {
@@ -58,12 +64,22 @@ export class RoundManager {
 			return;
 		}
 
-		const definition = peppers[pepper];
+		// holy shit what is this typed bullfuckery
+		const definition = peppers[pepper as keyof typeof peppers];
 		const model = player.Character || player.CharacterAdded.Wait()[0];
 
 		this.logger.Info("Applying pepper effect");
 		promiseR6(model).then((character) => {
 			definition.effect(character);
 		});
+	}
+
+	public PepperPrompt() {
+		// oh my god lord forgive me for this heresy
+		const randomPepper = () =>
+			peppers[this.pepperNames[math.random(1, this.pepperNames.size())] as keyof typeof peppers];
+
+		// it hurts me more than it hurts you
+		Events.pepper_prompt.broadcast([randomPepper().option, randomPepper().option, randomPepper().option]);
 	}
 }
