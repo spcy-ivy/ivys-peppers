@@ -6,7 +6,6 @@
   "scripts": {
     "build": "rbxtsc",
     "watch": "rbxtsc -w",
-
     "lint": "npx eslint src",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier src --check",
@@ -40,6 +39,7 @@
     "@rbxts/log": "^0.6.3",
     "@rbxts/promise-character": "^1.0.3",
     "@rbxts/react-roblox": "^0.2.0",
+    "@rbxts/reflex": "^4.2.2",
     "@rbxts/ripple": "^0.7.1",
     "@rbxts/roact": "npm:@rbxts/react-ts@^1.0.1",
     "@rbxts/rust-classes": "^0.12.0",

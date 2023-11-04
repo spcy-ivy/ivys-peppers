@@ -1,5 +1,5 @@
 import TestMode from "server/gamemodes/modes/TestMode";
 
-export const gamemodes: Record<string, () => Promise<Player[]>> = {
+export const gamemodes = {
 	test_mode: TestMode,
 };

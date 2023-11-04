@@ -1,3 +1,5 @@
+// all credit to: https://github.com/littensy/rbxts-react-example/blob/main/src/client/hooks/use-motion.ts
+
 import { createMotion, Motion, MotionGoal } from "@rbxts/ripple";
 import { Binding, useBinding, useEffect, useMemo } from "@rbxts/roact";
 

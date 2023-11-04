@@ -17,6 +17,13 @@ dont get confused when I use react shit with @rbxts/roact its based off of [this
 - [gh](https://cli.github.com/) for some github cli shit
 
 # credits
+# TODO
+- [x] add reflex state management
+- [x] add survivors store
+- [x] create dedicated zircon commands to affect that
+- [ ] manipulate store before running gamemode
+
+# Credits
 <div align="center">
     <p>cuz i cant do this alone lmao</p>
     <table>
@@ -46,4 +53,3 @@ dont get confused when I use react shit with @rbxts/roact its based off of [this
             </td>
         <tr>
     </table>
-</div>
