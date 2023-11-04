@@ -2,9 +2,9 @@
 dont get confused when I use react shit with @rbxts/roact its based off of [this](https://github.com/littensy/rbxts-react-example/) and apparently its to avoid conflicts w/ rbxts compiler
 
 # TODO
-- [ ] add reflex state management
-- [ ] add survivors store
-- [ ] create dedicated zircon commands to affect that
+- [x] add reflex state management
+- [x] add survivors store
+- [x] create dedicated zircon commands to affect that
 - [ ] manipulate store before running gamemode
 
 # Credits
