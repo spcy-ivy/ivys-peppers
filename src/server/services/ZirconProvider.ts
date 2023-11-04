@@ -13,7 +13,7 @@ export class ZirconProvider implements OnInit {
 		ZirconServer.Registry.Init(
 			ZirconConfigurationBuilder.default()
 				.AddFunction(this.TestGamemode, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.StopGamemode, [ZirconDefaultGroup.Creator])
+				.AddFunction(this.CancelGamemode, [ZirconDefaultGroup.Creator])
 				.AddFunction(this.Announce, [ZirconDefaultGroup.Creator])
 				.AddFunction(this.TestPepper, [ZirconDefaultGroup.Creator])
 				.AddFunction(this.PepperPrompt, [ZirconDefaultGroup.Creator])
@@ -29,8 +29,8 @@ export class ZirconProvider implements OnInit {
 		.AddArgument("string")
 		.Bind((_context, mode) => this.roundManager.RunGamemode(mode));
 
-	private StopGamemode = new ZirconFunctionBuilder("stop_gamemode").Bind((_context) =>
-		this.roundManager.StopGamemode(),
+	private CancelGamemode = new ZirconFunctionBuilder("cancel_gamemode").Bind((_context) =>
+		this.roundManager.CancelGamemode(),
 	);
 
 	private Announce = new ZirconFunctionBuilder("announce")

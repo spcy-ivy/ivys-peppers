@@ -17,7 +17,7 @@ export const survivorsSlice = createProducer(initialState, {
 	removeSurvivor: (state, player: Player) => ({
 		// the [0] is the vec where the condition is met
 		// good god functional programming is so cursed yet so beautiful...
-		survivors: state.survivors.iter().partition((current) => current !== player)[1],
+		survivors: state.survivors.iter().partition((current) => current !== player)[0],
 	}),
 
 	setSurvivors: (_state, players: Player[]) => ({

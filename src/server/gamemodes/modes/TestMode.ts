@@ -20,16 +20,18 @@ async function winCondition(): Promise<Player[]> {
 		),
 	);
 
-	const survivors = store.getState().survivorsSlice.survivors;
+	const retrieved = store.getState().survivorsSlice.survivors;
 
-	if (survivors.len() < 2) {
+	/*
+	if (retrieved.len() < 2) {
 		return new Promise<Player[]>((resolve) => {
-			Log.Warn("not enough players!");
+			Log.Error("not enough players!");
 			resolve([]);
 		});
 	}
+  */
 
-	survivors.iter().forEach((player) => {
+	retrieved.iter().forEach((player) => {
 		const character = player.Character || player.CharacterAdded.Wait()[0];
 		promiseR6(character).then((model) => model.Humanoid.Died.Once(() => store.removeSurvivor(player)));
 	});
@@ -44,6 +46,8 @@ async function winCondition(): Promise<Player[]> {
 
 		endGame.Wait();
 		obliterator.Destroy();
+
+		const survivors = store.getState().survivorsSlice.survivors;
 		resolve(survivors.asPtr());
 	});
 }

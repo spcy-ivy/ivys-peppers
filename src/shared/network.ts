@@ -1,11 +1,14 @@
 import { Networking } from "@flamework/networking";
 import { PepperOption } from "types/interfaces/Peppers";
 
-interface ClientToServerEvents {}
+interface ClientToServerEvents {
+	confirmPepper(pepperName: string): void;
+}
 
 interface ServerToClientEvents {
 	announce(text: string): void;
-	pepper_prompt(cards: PepperOption[]): void;
+	pepperPrompt(cards: PepperOption[]): void;
+	cancelPepperPrompt(): void;
 }
 
 interface ClientToServerFunctions {}
