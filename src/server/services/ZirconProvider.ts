@@ -3,6 +3,7 @@ import { Logger } from "@rbxts/log";
 import { ZirconConfigurationBuilder, ZirconDefaultGroup, ZirconFunctionBuilder, ZirconServer } from "@rbxts/zircon";
 import { RoundManager } from "./RoundManager";
 import { Events } from "server/network";
+import { store } from "server/store";
 
 @Service()
 export class ZirconProvider implements OnInit {
@@ -16,6 +17,10 @@ export class ZirconProvider implements OnInit {
 				.AddFunction(this.Announce, [ZirconDefaultGroup.Creator])
 				.AddFunction(this.TestPepper, [ZirconDefaultGroup.Creator])
 				.AddFunction(this.PepperPrompt, [ZirconDefaultGroup.Creator])
+				.AddFunction(this.AddSurvivor, [ZirconDefaultGroup.Creator])
+				.AddFunction(this.RemoveSurvivor, [ZirconDefaultGroup.Creator])
+				.AddFunction(this.ClearSurvivors, [ZirconDefaultGroup.Creator])
+				.AddFunction(this.ListSurvivors, [ZirconDefaultGroup.Creator])
 				.Build(),
 		);
 	}
@@ -39,4 +44,22 @@ export class ZirconProvider implements OnInit {
 	private PepperPrompt = new ZirconFunctionBuilder("pepper_prompt").Bind((_context) =>
 		this.roundManager.PepperPrompt(),
 	);
+
+	private AddSurvivor = new ZirconFunctionBuilder("add_survivor").AddArgument("player").Bind((_context, player) => {
+		store.addSurvivor(player);
+	});
+
+	private RemoveSurvivor = new ZirconFunctionBuilder("remove_survivor")
+		.AddArgument("player")
+		.Bind((_context, player) => {
+			store.removeSurvivor(player);
+		});
+
+	private ClearSurvivors = new ZirconFunctionBuilder("clear_survivors").Bind((_context) => {
+		store.clearSurvivors();
+	});
+
+	private ListSurvivors = new ZirconFunctionBuilder("list_survivors").Bind((_context) => {
+		this.logger.Info("survivors: {survivors}", store.getState().survivorsSlice.survivors.asPtr());
+	});
 }

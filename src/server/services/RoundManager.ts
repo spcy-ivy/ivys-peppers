@@ -5,6 +5,7 @@ import { Option } from "@rbxts/rust-classes";
 import { Events } from "server/network";
 import { gamemodes } from "server/gamemodes";
 import { peppers } from "server/peppers";
+import { store } from "server/store";
 
 /**
  * 1. [x] get gamemode
@@ -40,14 +41,16 @@ export class RoundManager {
 			return;
 		}
 
-		this.logger.Info("testing started!");
-		this.winCondition = Option.some(gamemodes[gamemode]());
+		this.logger.Info("Testing started!");
+		const condition = gamemodes[gamemode as keyof typeof gamemodes]();
+		this.winCondition = Option.some(condition);
 		this.logger.Info("Currently running {gamemode} mode", gamemode);
 
 		// wacky syntax hahaha
 		const winnersPromise = this.winCondition.unwrap();
 		winnersPromise.catch((err) => this.logger.Error("Gamemode caught error: {error}", err));
 		const winners = winnersPromise.expect();
+
 		this.logger.Info("Finished testing! The winners are {winners}", winners);
 	}
 
@@ -55,6 +58,9 @@ export class RoundManager {
 		if (this.winCondition.isSome()) {
 			const winnersPromise = this.winCondition.unwrap();
 			winnersPromise.cancel();
+			store.clearSurvivors();
+
+			this.logger.Info("Ended gamemode and cleared survivors!");
 		}
 	}
 
@@ -76,10 +82,10 @@ export class RoundManager {
 
 	public PepperPrompt() {
 		// oh my god lord forgive me for this heresy
+		// APPARENTLY when it compiles it adds 1 so I have to negate the random params :(
 		const randomPepper = () =>
-			peppers[this.pepperNames[math.random(1, this.pepperNames.size())] as keyof typeof peppers];
+			peppers[this.pepperNames[math.random(0, this.pepperNames.size() - 1)] as keyof typeof peppers];
 
-		// it hurts me more than it hurts you
 		Events.pepper_prompt.broadcast([randomPepper().option, randomPepper().option, randomPepper().option]);
 	}
 }

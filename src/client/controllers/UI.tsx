@@ -7,18 +7,18 @@ import { PepperPrompt } from "client/ui/components/pepper_prompt";
 
 @Controller()
 export class UI implements OnStart {
-	onStart() {
-		const root = createRoot(new Instance("Folder"));
-		const target = Players.LocalPlayer.WaitForChild("PlayerGui");
+  onStart() {
+    const root = createRoot(new Instance("Folder"));
+    const target = Players.LocalPlayer.WaitForChild("PlayerGui");
 
-		root.render(
-			createPortal(
-				<StrictMode>
-					<Announcements />
-					<PepperPrompt />
-				</StrictMode>,
-				target,
-			),
-		);
-	}
+    root.render(
+      createPortal(
+        <StrictMode>
+          <Announcements />
+          <PepperPrompt />
+        </StrictMode>,
+        target,
+      ),
+    );
+  }
 }

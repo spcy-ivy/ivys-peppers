@@ -3,26 +3,38 @@ import { Janitor } from "@rbxts/janitor";
 import Log from "@rbxts/log";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Players } from "@rbxts/services";
+import { store } from "server/store";
 
 async function winCondition(): Promise<Player[]> {
-	const survivors = Players.GetPlayers();
 	const obliterator = new Janitor();
 	const endGame = new Signal<undefined>();
 
 	obliterator.Add(endGame);
 
-	const removeSurvivor = (player: Player) => {
-		survivors.remove(survivors.indexOf(player, 0));
+	obliterator.Add(
+		store.observe(
+			(state) => state.survivorsSlice,
+			(survivors) => {
+				if (survivors.len() < 2) endGame.Fire(undefined);
+			},
+		),
+	);
 
-		if (survivors.size() < 2) endGame.Fire(undefined);
-	};
+	const survivors = store.getState().survivorsSlice.survivors;
 
-	survivors.forEach((player) => {
+	if (survivors.len() < 2) {
+		return new Promise<Player[]>((resolve) => {
+			Log.Warn("not enough players!");
+			resolve([]);
+		});
+	}
+
+	survivors.iter().forEach((player) => {
 		const character = player.Character || player.CharacterAdded.Wait()[0];
-		promiseR6(character).then((model) => model.Humanoid.Died.Once(() => removeSurvivor(player)));
+		promiseR6(character).then((model) => model.Humanoid.Died.Once(() => store.removeSurvivor(player)));
 	});
 
-	obliterator.Add(Players.PlayerRemoving.Connect(removeSurvivor));
+	obliterator.Add(Players.PlayerRemoving.Connect((player) => store.removeSurvivor(player)));
 
 	return new Promise<Player[]>((resolve, _reject, onCancel) => {
 		onCancel(() => {
@@ -32,7 +44,7 @@ async function winCondition(): Promise<Player[]> {
 
 		endGame.Wait();
 		obliterator.Destroy();
-		resolve(survivors);
+		resolve(survivors.asPtr());
 	});
 }
 
