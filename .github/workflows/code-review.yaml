@@ -18,3 +18,9 @@ jobs:
 
       - name: Lint Normal Files
         run: npm run lint
+
+      - name: Lint Normal Files
+        run: npm run lint
+
+      - name: Check Formatting
+        run: npm run prettier

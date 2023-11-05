@@ -41,6 +41,12 @@
 		},
 		"Workspace": {
 			"$className": "Workspace",
+      "Lobby": {
+			  "$path": "assets/workspace/lobby.rbxmx"
+      },
+      "Terrain": {
+        "$path": "assets/workspace/terrain.rbxmx"
+      },
 			"$properties": {
 				"FilteringEnabled": true
 			}
