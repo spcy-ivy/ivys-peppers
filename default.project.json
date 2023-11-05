@@ -10,6 +10,9 @@
 			"$className": "ServerScriptService",
 			"TS": {
 				"$path": "out/server"
+			},
+			"Models": {
+		 		"$path": "assets/models"
 			}
 		},
 		"ReplicatedStorage": {

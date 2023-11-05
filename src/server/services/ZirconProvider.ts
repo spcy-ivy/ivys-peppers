@@ -12,15 +12,23 @@ export class ZirconProvider implements OnInit {
 	onInit() {
 		ZirconServer.Registry.Init(
 			ZirconConfigurationBuilder.default()
-				.AddFunction(this.TestGamemode, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.CancelGamemode, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.Announce, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.TestPepper, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.PepperPrompt, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.AddSurvivor, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.RemoveSurvivor, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.ClearSurvivors, [ZirconDefaultGroup.Creator])
-				.AddFunction(this.ListSurvivors, [ZirconDefaultGroup.Creator])
+				.CreateGroup(254, ZirconDefaultGroup.Admin, (group) => {
+					return group.BindToUserIds([
+						5199512481, // pnmpki2
+						543918313, // pnmpki1
+						3814464357, // me
+					]);
+				})
+				.AddFunction(this.TestGamemode, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.CancelGamemode, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.Announce, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.TestPepper, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.PepperPrompt, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.AddSurvivor, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.RemoveSurvivor, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.ClearSurvivors, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.ListSurvivors, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.SetAllSurvivors, [ZirconDefaultGroup.Admin])
 				.Build(),
 		);
 	}
@@ -61,5 +69,9 @@ export class ZirconProvider implements OnInit {
 
 	private ListSurvivors = new ZirconFunctionBuilder("list_survivors").Bind((_context) => {
 		this.logger.Info("survivors: {survivors}", store.getState().survivorsSlice.survivors.asPtr());
+	});
+
+	private SetAllSurvivors = new ZirconFunctionBuilder("set_all_survivors").Bind((_context) => {
+		store.setAllSurvivors();
 	});
 }

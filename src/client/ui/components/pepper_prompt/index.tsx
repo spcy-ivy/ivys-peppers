@@ -51,7 +51,7 @@ export function PepperPrompt() {
 	});
 
 	return (
-		<screengui Enabled={visible} IgnoreGuiInset={true}>
+		<screengui Enabled={visible} IgnoreGuiInset={true} ResetOnSpawn={false}>
 			<Cards enabled={enabled} cards={cards} pressedCallback={disappear} />
 		</screengui>
 	);
