@@ -23,12 +23,17 @@ import { store } from "server/store";
 export class RoundManager implements OnStart {
 	private winCondition: Option<Promise<unknown>> = Option.none();
 	private pepperNames: string[] = [];
+	private gamemodeNames: string[] = [];
 	private canApplyPepper = false;
 	private pepperApplied: Player[] = [];
 
 	public constructor(private readonly logger: Logger) {
 		for (const [key, _value] of pairs(peppers)) {
 			this.pepperNames.push(key);
+		}
+
+		for (const [key, _value] of pairs(gamemodes)) {
+			this.gamemodeNames.push(key);
 		}
 	}
 
@@ -97,6 +102,11 @@ export class RoundManager implements OnStart {
 
 			this.logger.Info("Ended gamemode and cleared survivors!");
 		}
+	}
+
+	public RandomGamemode() {
+		const randomGamemode = () => this.gamemodeNames[math.random(0, this.gamemodeNames.size() - 1)];
+		this.RunGamemode(randomGamemode());
 	}
 
 	public ApplyPepper(player: Player, pepper: string) {

@@ -12,5 +12,15 @@ interface ServerScriptService {
 				};
 			};
 		};
+		sword: Tool & {
+			Handle: Part & {
+				SwordLunge: Sound;
+				Unsheath: Sound;
+				Mesh: SpecialMesh;
+				SwordSlash: Sound;
+			};
+			MouseIcon: LocalScript;
+			SwordScript: Script;
+		};
 	};
 }

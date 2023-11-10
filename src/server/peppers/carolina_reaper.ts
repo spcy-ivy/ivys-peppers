@@ -3,7 +3,7 @@ import { PepperDefinition } from "types/interfaces/Peppers";
 export const CarolinaReaper: PepperDefinition = {
 	option: {
 		icon: "rbxgameasset://Images/carolina_reaper",
-		name: "carolina reaper",
+		name: "carolina_reaper",
 		description: "fast but cant jump and 1 health lol",
 	},
 	effect: (rig) => {
@@ -13,4 +13,4 @@ export const CarolinaReaper: PepperDefinition = {
 		humanoid.JumpPower = 0;
 		humanoid.WalkSpeed = 64;
 	},
-}
+};

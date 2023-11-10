@@ -1,7 +1,7 @@
 import { Players } from "@rbxts/services";
 import { createProducer } from "@rbxts/reflex";
 import { Vec } from "@rbxts/rust-classes";
-import { ServerState } from ".";
+import { ServerState, store } from ".";
 
 export type SurvivorsState = {
 	survivors: Vec<Player>;

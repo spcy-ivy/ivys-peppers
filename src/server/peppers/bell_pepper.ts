@@ -3,7 +3,7 @@ import { PepperDefinition } from "types/interfaces/Peppers";
 export const BellPepper: PepperDefinition = {
 	option: {
 		icon: "rbxgameasset://Images/bell_pepper",
-		name: "bell pepper",
+		name: "bell_pepper",
 		description: "half health n' speed, high jump!",
 	},
 	effect: (rig) => {

@@ -5,7 +5,7 @@ import { Signal } from "@rbxts/beacon";
 import { Janitor } from "@rbxts/janitor";
 import { promiseR6 } from "@rbxts/promise-character";
 import { store } from "server/store";
-import { selectSurvivors } from "server/store/survivors";
+import { selectSurvivors, survivorsSlice } from "server/store/survivors";
 import Log from "@rbxts/log";
 
 export function initializeGamemode(): [Janitor<void>, Signal<Player[]>, Promise<Player[]>] {
@@ -14,8 +14,10 @@ export function initializeGamemode(): [Janitor<void>, Signal<Player[]>, Promise<
 
 	obliterator.Add(endGame);
 
+	// apparently it doesnt work with the selector :eyeroll:
 	obliterator.Add(
-		store.subscribe(selectSurvivors, (survivors) => {
+		store.subscribe((state) => {
+			const survivors = state.survivorsSlice.survivors;
 			if (survivors.len() < 2) endGame.Fire(...survivors.asPtr());
 		}),
 	);
@@ -29,7 +31,14 @@ export function initializeGamemode(): [Janitor<void>, Signal<Player[]>, Promise<
 
 	retrieved.iter().forEach((player) => {
 		const character = player.Character || player.CharacterAdded.Wait()[0];
-		promiseR6(character).then((model) => model.Humanoid.Died.Once(() => store.removeSurvivor(player)));
+		promiseR6(character).then((model) =>
+			model.Humanoid.Died.Once(() => {
+				print("died!!");
+				print(store.getState(selectSurvivors));
+				store.removeSurvivor(player);
+				print(store.getState(selectSurvivors));
+			}),
+		);
 	});
 
 	obliterator.Add(Players.PlayerRemoving.Connect((player) => store.removeSurvivor(player)));

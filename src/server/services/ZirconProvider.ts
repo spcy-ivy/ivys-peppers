@@ -21,6 +21,7 @@ export class ZirconProvider implements OnInit {
 				})
 				.AddFunction(this.TestGamemode, [ZirconDefaultGroup.Admin])
 				.AddFunction(this.CancelGamemode, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.RandomGamemode, [ZirconDefaultGroup.Admin])
 				.AddFunction(this.Announce, [ZirconDefaultGroup.Admin])
 				.AddFunction(this.TestPepper, [ZirconDefaultGroup.Admin])
 				.AddFunction(this.PepperPrompt, [ZirconDefaultGroup.Admin])
@@ -39,6 +40,10 @@ export class ZirconProvider implements OnInit {
 
 	private CancelGamemode = new ZirconFunctionBuilder("cancel_gamemode").Bind((_context) =>
 		this.roundManager.CancelGamemode(),
+	);
+
+	private RandomGamemode = new ZirconFunctionBuilder("random_gamemode").Bind((_context) =>
+		this.roundManager.RandomGamemode(),
 	);
 
 	private Announce = new ZirconFunctionBuilder("announce")
