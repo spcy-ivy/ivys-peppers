@@ -3,6 +3,7 @@ import { store } from "server/store";
 import { initializeGamemode } from "../helpers/initializeGamemode";
 import { selectSurvivors } from "server/store/survivors";
 import { promiseR6 } from "@rbxts/promise-character";
+import { Events } from "server/network";
 
 const sword = ServerScriptService.Models.sword;
 
@@ -17,7 +18,10 @@ async function winCondition(): Promise<Player[]> {
 			promiseR6(model).then((character) => (sword.Clone().Parent = character));
 		});
 
-	return endGamePromise;
+	return endGamePromise.tap((winners) => {
+		task.wait(1); // waits so that the players can see who won
+		Events.announce.broadcast(`${winners[0]} is the last standing!`);
+	});
 }
 
 export = winCondition;

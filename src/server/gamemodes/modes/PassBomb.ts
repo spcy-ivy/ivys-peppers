@@ -4,6 +4,7 @@ import { store } from "server/store";
 import { selectSurvivors } from "server/store/survivors";
 import Log from "@rbxts/log";
 import { Option } from "@rbxts/rust-classes";
+import { Events } from "server/network";
 
 //const round_length = 120;
 const round_length = 30;
@@ -89,7 +90,10 @@ async function winCondition(): Promise<Player[]> {
 
 	assign_bomb_to_random();
 
-	return endGamePromise;
+	return endGamePromise.tap(() => {
+		task.wait(1); // waits so that the players can see who won
+		Events.announce.broadcast(`${assigned.unwrap()} has lost!`);
+	});
 }
 
 export = winCondition;

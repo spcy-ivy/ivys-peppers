@@ -24,10 +24,10 @@ export function initializeGamemode(): [Janitor<void>, Signal<Player[]>, Promise<
 
 	const retrieved = store.getState(selectSurvivors);
 
-	// if (retrieved.len() < 2) {
-	// Log.Error("not enough players!");
-	// endGame.Fire();
-	// }
+	if (retrieved.len() < 2) {
+		Log.Error("not enough players!");
+		endGame.Fire();
+	}
 
 	retrieved.iter().forEach((player) => {
 		const character = player.Character || player.CharacterAdded.Wait()[0];

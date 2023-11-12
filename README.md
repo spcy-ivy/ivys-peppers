@@ -18,10 +18,9 @@ dont get confused when I use react shit with @rbxts/roact its based off of [this
 
 # credits
 # TODO
-- [x] add reflex state management
-- [x] add survivors store
-- [x] create dedicated zircon commands to affect that
-- [ ] manipulate store before running gamemode
+- [x] add cooldown before ending games to see who won
+- [x] add announcements at the end to announce who won
+- [ ] add different default map variants for each gamemode
 
 # Credits
 <div align="center">
@@ -53,3 +52,4 @@ dont get confused when I use react shit with @rbxts/roact its based off of [this
             </td>
         <tr>
     </table>
+</div>
