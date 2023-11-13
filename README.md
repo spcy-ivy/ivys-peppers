@@ -17,12 +17,6 @@ dont get confused when I use react shit with @rbxts/roact its based off of [this
 - [gh](https://cli.github.com/) for some github cli shit
 
 # credits
-# TODO
-- [x] add cooldown before ending games to see who won
-- [x] add announcements at the end to announce who won
-- [ ] add different default map variants for each gamemode
-
-# Credits
 <div align="center">
     <p>cuz i cant do this alone lmao</p>
     <table>
