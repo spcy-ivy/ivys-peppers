@@ -92,10 +92,6 @@ export class RoundManager implements OnStart {
 		});
 	}
 
-	StartRound() {
-		this.logger.Info("round started!");
-	}
-
 	private StopGamemode() {
 		store.clearSurvivors();
 		this.winCondition = Option.none();
