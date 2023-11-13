@@ -1,5 +1,5 @@
 import { Service, OnStart } from "@flamework/core";
-import { Players } from "@rbxts/services";
+import { Players, Workspace, ServerScriptService } from "@rbxts/services";
 import { Logger } from "@rbxts/log";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Option } from "@rbxts/rust-classes";
@@ -7,6 +7,7 @@ import { Events } from "server/network";
 import { gamemodes } from "server/gamemodes";
 import { peppers } from "server/peppers";
 import { store } from "server/store";
+import { selectVariant } from "server/store/lobbyVariants";
 
 /**
  * 1. [x] get gamemode
@@ -22,13 +23,24 @@ import { store } from "server/store";
 @Service()
 export class RoundManager implements OnStart {
 	private winCondition: Option<Promise<unknown>> = Option.none();
+
 	private pepperNames: string[] = [];
+	private gamemodeNames: string[] = [];
+
 	private canApplyPepper = false;
 	private pepperApplied: Player[] = [];
+
+	private lobby: Model = Workspace.Lobby;
+	private loadedVariant: Option<Model> = Option.none();
+	private variants = ServerScriptService.Maps.lobby_variants;
 
 	public constructor(private readonly logger: Logger) {
 		for (const [key, _value] of pairs(peppers)) {
 			this.pepperNames.push(key);
+		}
+
+		for (const [key, _value] of pairs(gamemodes)) {
+			this.gamemodeNames.push(key);
 		}
 	}
 
@@ -46,6 +58,38 @@ export class RoundManager implements OnStart {
 				this.pepperApplied.push(player);
 			});
 		});
+
+		// HACKY AND TERRIBLE CODE AHEAD!!! BEWARE!!
+		// wont revise because im lazy
+		store.subscribe(selectVariant, (variant) => {
+			if (variant.isNone()) {
+				this.logger.Info("load the lobby!!");
+
+				if (this.loadedVariant.isSome()) {
+					this.loadedVariant.unwrap().Destroy();
+					this.loadedVariant = Option.none();
+				}
+
+				this.lobby.Parent = Workspace;
+				return;
+			}
+
+			const map = this.variants.FindFirstChild(variant.unwrap());
+
+			if (!map) {
+				this.logger.Warn(
+					`for some sick and twisted reason a registered variant wasnt in the folder, wont load, cursed variant was ${variant.unwrap()}`,
+				);
+				return;
+			}
+
+			const clone = map.Clone();
+			this.loadedVariant = Option.some(clone as Model);
+			clone.Parent = Workspace;
+			this.lobby.Parent = undefined;
+
+			this.logger.Info(`loaded variant ${variant.unwrap()}!!!!`);
+		});
 	}
 
 	StartRound() {
@@ -55,6 +99,7 @@ export class RoundManager implements OnStart {
 	private StopGamemode() {
 		store.clearSurvivors();
 		this.winCondition = Option.none();
+		store.setDefaultLobby();
 
 		Players.GetPlayers().forEach((player) => {
 			if (!player.Character) return;
@@ -97,6 +142,11 @@ export class RoundManager implements OnStart {
 
 			this.logger.Info("Ended gamemode and cleared survivors!");
 		}
+	}
+
+	public RandomGamemode() {
+		const randomGamemode = () => this.gamemodeNames[math.random(0, this.gamemodeNames.size() - 1)];
+		this.RunGamemode(randomGamemode());
 	}
 
 	public ApplyPepper(player: Player, pepper: string) {

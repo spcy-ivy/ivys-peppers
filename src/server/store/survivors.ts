@@ -1,5 +1,7 @@
+import { Players } from "@rbxts/services";
 import { createProducer } from "@rbxts/reflex";
 import { Vec } from "@rbxts/rust-classes";
+import { ServerState } from ".";
 
 export type SurvivorsState = {
 	survivors: Vec<Player>;
@@ -11,20 +13,29 @@ const initialState: SurvivorsState = {
 
 export const survivorsSlice = createProducer(initialState, {
 	addSurvivor: (state, player: Player) => ({
+		...state,
 		survivors: state.survivors.push(player),
 	}),
 
 	removeSurvivor: (state, player: Player) => ({
-		// the [0] is the vec where the condition is met
-		// good god functional programming is so cursed yet so beautiful...
-		survivors: state.survivors.iter().partition((current) => current !== player)[0],
+		...state,
+		survivors: state.survivors.retain((current) => current !== player),
 	}),
 
-	setSurvivors: (_state, players: Player[]) => ({
+	setSurvivors: (state, players: Player[]) => ({
+		...state,
 		survivors: Vec.vec<Player>(...players),
 	}),
 
-	clearSurvivors: () => ({
+	setAllSurvivors: (state) => ({
+		...state,
+		survivors: Vec.vec<Player>(...Players.GetPlayers()),
+	}),
+
+	clearSurvivors: (state) => ({
+		...state,
 		survivors: Vec.vec<Player>(),
 	}),
 });
+
+export const selectSurvivors = (state: ServerState) => state.survivorsSlice.survivors;

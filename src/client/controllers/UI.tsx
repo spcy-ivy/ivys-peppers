@@ -1,7 +1,8 @@
-import { Controller, OnInit, OnStart } from "@flamework/core";
+import { Controller, OnStart } from "@flamework/core";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
 import Roact, { StrictMode } from "@rbxts/roact";
 import { Players } from "@rbxts/services";
+import { Events } from "client/network";
 import { Announcements } from "client/ui/components/announcements";
 import { PepperPrompt } from "client/ui/components/pepper_prompt";
 
