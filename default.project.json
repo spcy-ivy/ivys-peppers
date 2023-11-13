@@ -13,7 +13,10 @@
 			},
 			"Models": {
 		 		"$path": "assets/models"
-			}
+			},
+      "Maps": {
+        "$path": "assets/maps"
+      }
 		},
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",

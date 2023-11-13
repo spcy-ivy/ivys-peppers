@@ -1,9 +1,11 @@
-import { combineProducers, CombineStates } from "@rbxts/reflex";
+import { combineProducers, InferState } from "@rbxts/reflex";
 import { survivorsSlice } from "./survivors";
+import { lobbyVariantsSlice } from "./lobbyVariants";
 
-const slices = {
+export type ServerStore = typeof store;
+export type ServerState = InferState<ServerStore>;
+
+export const store = combineProducers({
 	survivorsSlice,
-};
-
-export const store = combineProducers(slices);
-export type ServerState = CombineStates<typeof slices>;
+	lobbyVariantsSlice,
+});

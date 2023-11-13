@@ -1,26 +1,15 @@
 interface ServerScriptService {
 	Models: Folder & {
 		bomb: Tool & {
-			Handle: MeshPart & {
-				Stem: UnionOperation & {
-					ParticleEmitter: ParticleEmitter;
-					WeldConstraint: WeldConstraint;
-				};
-				Decal: Decal;
-				Top: MeshPart & {
-					WeldConstraint: WeldConstraint;
-				};
-			};
+			Handle: MeshPart;
 		};
-		sword: Tool & {
-			Handle: Part & {
-				SwordLunge: Sound;
-				Unsheath: Sound;
-				Mesh: SpecialMesh;
-				SwordSlash: Sound;
-			};
-			MouseIcon: LocalScript;
-			SwordScript: Script;
-		};
+		sword: Tool;
 	};
+	Maps: Folder & {
+		lobby_variants: Folder;
+	};
+}
+
+interface Workspace {
+	Lobby: Model;
 }
