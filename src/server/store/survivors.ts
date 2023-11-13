@@ -1,7 +1,7 @@
 import { Players } from "@rbxts/services";
 import { createProducer } from "@rbxts/reflex";
 import { Vec } from "@rbxts/rust-classes";
-import { ServerState, store } from ".";
+import { ServerState } from ".";
 
 export type SurvivorsState = {
 	survivors: Vec<Player>;
@@ -13,26 +13,29 @@ const initialState: SurvivorsState = {
 
 export const survivorsSlice = createProducer(initialState, {
 	addSurvivor: (state, player: Player) => ({
+		...state,
 		survivors: state.survivors.push(player),
 	}),
 
 	removeSurvivor: (state, player: Player) => ({
+		...state,
 		survivors: state.survivors.retain((current) => current !== player),
 	}),
 
-	setSurvivors: (_state, players: Player[]) => ({
+	setSurvivors: (state, players: Player[]) => ({
+		...state,
 		survivors: Vec.vec<Player>(...players),
 	}),
 
-	setAllSurvivors: (_state) => ({
+	setAllSurvivors: (state) => ({
+		...state,
 		survivors: Vec.vec<Player>(...Players.GetPlayers()),
 	}),
 
-	clearSurvivors: () => ({
+	clearSurvivors: (state) => ({
+		...state,
 		survivors: Vec.vec<Player>(),
 	}),
 });
 
-export const selectSurvivors = (state: ServerState) => {
-	return state.survivorsSlice.survivors;
-};
+export const selectSurvivors = (state: ServerState) => state.survivorsSlice.survivors;
