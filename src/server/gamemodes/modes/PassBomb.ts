@@ -51,6 +51,9 @@ async function winCondition(): Promise<Player[]> {
 		}),
 	);
 
+	// when the bomb gets destroyed for some reason (it can fall off of the void)
+	obliterator.Add(bomb.Destroying.Connect(() => endGame.Fire()));
+
 	// not adding onto janitor since the instance is already in it (and destroying instance auto disconnects all of its events)
 	handle.Touched.Connect((touched) => {
 		if (assigned.isNone()) return;
