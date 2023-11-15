@@ -9,20 +9,12 @@ import { peppers } from "server/peppers";
 import { store } from "server/store";
 import { selectVariant } from "server/store/lobbyVariants";
 
-/**
- * 1. [x] get gamemode
- *   - [x] gamemode activation/selection
- *   - [x] gamemode cancellation
- *   - [x] announcements
- * 2. [x] pepper prompt
- * 3. [x] load gamemode
- * 4. [x] load pepper shit
- * 5. [x] wait until win condition (w/ promises)
- */
+// i really want to split this up but cant because then itd be unnecessary abstraction
+// why is being a programmer so painful
 
 @Service()
 export class RoundManager implements OnStart {
-	private winCondition: Option<Promise<unknown>> = Option.none();
+	private winCondition: Option<Promise<Player[]>> = Option.none();
 
 	private pepperNames: string[] = [];
 	private gamemodeNames: string[] = [];
@@ -33,6 +25,9 @@ export class RoundManager implements OnStart {
 	private lobby: Model = Workspace.Lobby;
 	private loadedVariant: Option<Model> = Option.none();
 	private variants = ServerScriptService.Maps.lobby_variants;
+
+	private automatedRound: Option<Promise<Player[]>> = Option.none();
+	private automating = false;
 
 	public constructor(private readonly logger: Logger) {
 		for (const [key, _value] of pairs(peppers)) {
@@ -88,12 +83,56 @@ export class RoundManager implements OnStart {
 			clone.Parent = Workspace;
 			this.lobby.Parent = undefined;
 
-			this.logger.Info(`loaded variant ${variant.unwrap()}!!!!`);
+			this.logger.Info("loaded variant {variant}!!!!", variant.unwrap());
 		});
+
+		this.BeginAutomation();
 	}
 
-	StartRound() {
-		this.logger.Info("round started!");
+	public BeginAutomation() {
+		this.logger.Info("starting round automation");
+
+		this.automating = true;
+		while (this.automating) {
+			do {
+				task.wait(5);
+			} while (Players.GetPlayers().size() < 2);
+
+			// dunno if cancelling this will exactly work... but cant live life without risk
+			const round = new Promise((resolve, _reject, onCancel) => {
+				onCancel(() => {
+					this.canApplyPepper = false;
+					Events.cancelPepperPrompt.broadcast();
+					this.CancelGamemode();
+				});
+
+				store.setAllSurvivors();
+				this.PepperPrompt();
+				resolve(undefined);
+			})
+				.andThenCall(Promise.delay, 5)
+				.andThenCall(() => this.RandomGamemode())
+				.then((survivors) => new Promise((resolve) => resolve(survivors)))
+				.catch((reason) => {
+					this.logger.Warn("round errored with reason {reason}", reason);
+				}) as Promise<Player[]>;
+			// ^^^^^^^^^^^^^^^^^^^^
+			// need a stupid `as` statement because APPPAARREENNTTTLYYY the fucking compiler wont stop fucking whining
+			// TS compiler is so annoying sometimes
+
+			this.automatedRound = Option.some(round);
+			round.await();
+		}
+	}
+
+	public CancelAutomation() {
+		this.logger.Info("cancelling automation");
+
+		this.automating = false;
+		if (this.automatedRound.isSome()) {
+			this.automatedRound.unwrap().cancel();
+			this.automatedRound = Option.none();
+		}
 	}
 
 	private StopGamemode() {
@@ -107,15 +146,15 @@ export class RoundManager implements OnStart {
 		});
 	}
 
-	public RunGamemode(gamemode: string) {
+	public RunGamemode(gamemode: string): Player[] {
 		if (!(gamemode in gamemodes)) {
 			this.logger.Error("input gamemode is not valid! use snake_case!");
-			return;
+			return [];
 		}
 
 		if (this.winCondition.isSome()) {
 			this.logger.Error("a gamemode is already running!");
-			return;
+			return [];
 		}
 
 		this.logger.Info("Testing started!");
@@ -132,6 +171,7 @@ export class RoundManager implements OnStart {
 
 		this.StopGamemode();
 		this.logger.Info("Finished testing! The winners are {winners}", winners);
+		return winners ? winners : [];
 	}
 
 	public CancelGamemode() {
@@ -144,9 +184,9 @@ export class RoundManager implements OnStart {
 		}
 	}
 
-	public RandomGamemode() {
+	public RandomGamemode(): Player[] {
 		const randomGamemode = () => this.gamemodeNames[math.random(0, this.gamemodeNames.size() - 1)];
-		this.RunGamemode(randomGamemode());
+		return this.RunGamemode(randomGamemode());
 	}
 
 	public ApplyPepper(player: Player, pepper: string) {
