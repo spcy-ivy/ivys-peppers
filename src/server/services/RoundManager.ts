@@ -86,7 +86,7 @@ export class RoundManager implements OnStart {
 			this.logger.Info("loaded variant {variant}!!!!", variant.unwrap());
 		});
 
-		// this.BeginAutomation();
+		this.BeginAutomation();
 	}
 
 	public BeginAutomation() {
@@ -94,8 +94,12 @@ export class RoundManager implements OnStart {
 
 		this.automating = true;
 		while (this.automating) {
+			do {
+				task.wait(5);
+			} while (Players.GetPlayers().size() < 2);
+
 			// dunno if cancelling this will exactly work... but cant live life without risk
-			const round = new Promise((_resolve, _reject, onCancel) => {
+			const round = new Promise((resolve, _reject, onCancel) => {
 				onCancel(() => {
 					this.canApplyPepper = false;
 					Events.cancelPepperPrompt.broadcast();
@@ -104,6 +108,7 @@ export class RoundManager implements OnStart {
 
 				store.setAllSurvivors();
 				this.PepperPrompt();
+				resolve(undefined);
 			})
 				.andThenCall(Promise.delay, 5)
 				.andThenCall(() => this.RandomGamemode())
@@ -116,7 +121,7 @@ export class RoundManager implements OnStart {
 			// TS compiler is so annoying sometimes
 
 			this.automatedRound = Option.some(round);
-			round.expect();
+			round.await();
 		}
 	}
 
