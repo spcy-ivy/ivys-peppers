@@ -5,7 +5,7 @@
 	<Item class="Tool" referent="RBX5BF134A97ED84526B600FA0393041054">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
-			<bool name="CanBeDropped">true</bool>
+			<bool name="CanBeDropped">false</bool>
 			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 			<bool name="DefinesCapabilities">false</bool>
 			<bool name="Enabled">true</bool>
