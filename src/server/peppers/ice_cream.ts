@@ -2,7 +2,7 @@ import { PepperDefinition } from "types/interfaces/Peppers";
 
 export const IceCream: PepperDefinition = {
 	option: {
-		icon: "",
+		icon: "rbxgameasset://Images/ice_cream",
 		name: "ice_cream",
 		description: "health 1.25x but walk and jump 0.75x",
 	},

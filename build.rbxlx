@@ -92101,7 +92101,7 @@ return Symbol</string>
         <Properties>
           <string name="Name">bomb</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
-          <bool name="CanBeDropped">true</bool>
+          <bool name="CanBeDropped">false</bool>
           <bool name="DefinesCapabilities">false</bool>
           <bool name="Enabled">true</bool>
           <CoordinateFrame name="Grip">
@@ -93391,6 +93391,10 @@ local winCondition = TS.async(function()
 			assign_bomb_to_random()
 		end
 	end))
+	-- when the bomb gets destroyed for some reason (it can fall off of the void)
+	obliterator:Add(bomb.Destroying:Connect(function()
+		return endGame:Fire()
+	end))
 	-- not adding onto janitor since the instance is already in it (and destroying instance auto disconnects all of its events)
 	handle.Touched:Connect(function(touched)
 		if assigned:isNone() then
@@ -93504,9 +93508,17 @@ return winCondition
 ]]></string>
             </Properties>
           </Item>
+          <Item class="ModuleScript" referent="706">
+            <Properties>
+              <string name="Name">Trophy</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+return nil
+]]></string>
+            </Properties>
+          </Item>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="706">
+      <Item class="ModuleScript" referent="707">
         <Properties>
           <string name="Name">network</string>
           <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93523,7 +93535,7 @@ return {
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="707">
+      <Item class="ModuleScript" referent="708">
         <Properties>
           <string name="Name">peppers</string>
           <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93532,18 +93544,20 @@ local Tabasco = TS.import(script, game:GetService("ServerScriptService"), "TS", 
 local BellPepper = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "bell_pepper").BellPepper
 local Jalapeno = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "jalapeno").Jalapeno
 local CarolinaReaper = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "carolina_reaper").CarolinaReaper
+local IceCream = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "ice_cream").IceCream
 local peppers = {
 	tabasco = Tabasco,
 	bell_pepper = BellPepper,
 	jalapeno = Jalapeno,
 	carolina_reaper = CarolinaReaper,
+	ice_cream = IceCream,
 }
 return {
 	peppers = peppers,
 }
 ]]></string>
         </Properties>
-        <Item class="ModuleScript" referent="708">
+        <Item class="ModuleScript" referent="709">
           <Properties>
             <string name="Name">bell_pepper</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93567,7 +93581,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="709">
+        <Item class="ModuleScript" referent="710">
           <Properties>
             <string name="Name">carolina_reaper</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93591,7 +93605,32 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="710">
+        <Item class="ModuleScript" referent="711">
+          <Properties>
+            <string name="Name">ice_cream</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local IceCream = {
+	option = {
+		icon = "rbxgameasset://Images/ice_cream",
+		name = "ice_cream",
+		description = "health 1.25x but walk and jump 0.75x",
+	},
+	effect = function(rig)
+		local humanoid = rig.Humanoid
+		humanoid.MaxHealth = 125
+		humanoid.Health = humanoid.MaxHealth
+		-- actual number is like 37.5 but who cares
+		humanoid.JumpPower = 35
+		humanoid.WalkSpeed = 12
+	end,
+}
+return {
+	IceCream = IceCream,
+}
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="712">
           <Properties>
             <string name="Name">jalapeno</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93615,7 +93654,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="711">
+        <Item class="ModuleScript" referent="713">
           <Properties>
             <string name="Name">tabasco</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93640,7 +93679,7 @@ return {
           </Properties>
         </Item>
       </Item>
-      <Item class="Script" referent="712">
+      <Item class="Script" referent="714">
         <Properties>
           <string name="Name">runtime</string>
           <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93664,11 +93703,11 @@ Flamework.ignite()
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="713">
+      <Item class="Folder" referent="715">
         <Properties>
           <string name="Name">services</string>
         </Properties>
-        <Item class="ModuleScript" referent="714">
+        <Item class="ModuleScript" referent="716">
           <Properties>
             <string name="Name">RoundManager</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93905,7 +93944,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="715">
+        <Item class="ModuleScript" referent="717">
           <Properties>
             <string name="Name">ZirconProvider</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -93991,7 +94030,7 @@ return {
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="716">
+      <Item class="ModuleScript" referent="718">
         <Properties>
           <string name="Name">store</string>
           <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94008,7 +94047,7 @@ return {
 }
 ]]></string>
         </Properties>
-        <Item class="ModuleScript" referent="717">
+        <Item class="ModuleScript" referent="719">
           <Properties>
             <string name="Name">lobbyVariants</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94070,7 +94109,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="718">
+        <Item class="ModuleScript" referent="720">
           <Properties>
             <string name="Name">survivors</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94138,34 +94177,34 @@ return {
       </Item>
     </Item>
   </Item>
-  <Item class="SoundService" referent="719">
+  <Item class="SoundService" referent="721">
     <Properties>
       <string name="Name">SoundService</string>
       <bool name="RespectFilteringEnabled">true</bool>
     </Properties>
   </Item>
-  <Item class="StarterPlayer" referent="720">
+  <Item class="StarterPlayer" referent="722">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="721">
+    <Item class="StarterPlayerScripts" referent="723">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="722">
+      <Item class="Folder" referent="724">
         <Properties>
           <string name="Name">TS</string>
         </Properties>
-        <Item class="Folder" referent="723">
+        <Item class="Folder" referent="725">
           <Properties>
             <string name="Name">components</string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="724">
+        <Item class="Folder" referent="726">
           <Properties>
             <string name="Name">controllers</string>
           </Properties>
-          <Item class="ModuleScript" referent="725">
+          <Item class="ModuleScript" referent="727">
             <Properties>
               <string name="Name">UI</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94214,7 +94253,7 @@ return {
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="726">
+          <Item class="ModuleScript" referent="728">
             <Properties>
               <string name="Name">ZirconProvider</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94255,7 +94294,7 @@ return {
             </Properties>
           </Item>
         </Item>
-        <Item class="ModuleScript" referent="727">
+        <Item class="ModuleScript" referent="729">
           <Properties>
             <string name="Name">network</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94272,7 +94311,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="728">
+        <Item class="LocalScript" referent="730">
           <Properties>
             <string name="Name">runtime</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94295,15 +94334,15 @@ Flamework.ignite()
 ]]></string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="729">
+        <Item class="Folder" referent="731">
           <Properties>
             <string name="Name">ui</string>
           </Properties>
-          <Item class="Folder" referent="730">
+          <Item class="Folder" referent="732">
             <Properties>
               <string name="Name">components</string>
             </Properties>
-            <Item class="ModuleScript" referent="731">
+            <Item class="ModuleScript" referent="733">
               <Properties>
                 <string name="Name">announcements</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94314,6 +94353,8 @@ local useEffect = _roact.useEffect
 local useState = _roact.useState
 local Announcement = TS.import(script, script, "announcement").Announcement
 local Events = TS.import(script, script.Parent.Parent.Parent, "network").Events
+-- make multiple announcements be able to be stacked at once
+-- look up a youtube tutorial or something
 local function Announcements()
 	local text, setText = useState("science!!!")
 	local enabled, setEnabled = useState(false)
@@ -94342,7 +94383,7 @@ return {
 }
 ]]></string>
               </Properties>
-              <Item class="ModuleScript" referent="732">
+              <Item class="ModuleScript" referent="734">
                 <Properties>
                   <string name="Name">announcement</string>
                   <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94409,7 +94450,7 @@ return {
                 </Properties>
               </Item>
             </Item>
-            <Item class="ModuleScript" referent="733">
+            <Item class="ModuleScript" referent="735">
               <Properties>
                 <string name="Name">pepper_prompt</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94479,7 +94520,7 @@ return {
 }
 ]]></string>
               </Properties>
-              <Item class="ModuleScript" referent="734">
+              <Item class="ModuleScript" referent="736">
                 <Properties>
                   <string name="Name">cards</string>
                   <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94694,11 +94735,11 @@ return {
               </Item>
             </Item>
           </Item>
-          <Item class="Folder" referent="735">
+          <Item class="Folder" referent="737">
             <Properties>
               <string name="Name">hooks</string>
             </Properties>
-            <Item class="ModuleScript" referent="736">
+            <Item class="ModuleScript" referent="738">
               <Properties>
                 <string name="Name">use-motion</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94732,11 +94773,11 @@ return {
               </Properties>
             </Item>
           </Item>
-          <Item class="Folder" referent="737">
+          <Item class="Folder" referent="739">
             <Properties>
               <string name="Name">stories</string>
             </Properties>
-            <Item class="ModuleScript" referent="738">
+            <Item class="ModuleScript" referent="740">
               <Properties>
                 <string name="Name">announcements.story</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94759,7 +94800,7 @@ end
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="739">
+            <Item class="ModuleScript" referent="741">
               <Properties>
                 <string name="Name">cards.story</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94782,11 +94823,11 @@ end
               </Properties>
             </Item>
           </Item>
-          <Item class="Folder" referent="740">
+          <Item class="Folder" referent="742">
             <Properties>
               <string name="Name">utils</string>
             </Properties>
-            <Item class="ModuleScript" referent="741">
+            <Item class="ModuleScript" referent="743">
               <Properties>
                 <string name="Name">colorscheme</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94833,7 +94874,7 @@ return _object
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="742">
+            <Item class="ModuleScript" referent="744">
               <Properties>
                 <string name="Name">springs</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -94865,12 +94906,12 @@ return {
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="743">
+  <Item class="Workspace" referent="745">
     <Properties>
       <string name="Name">Workspace</string>
       <bool name="FilteringEnabled">true</bool>
     </Properties>
-    <Item class="Model" referent="744">
+    <Item class="Model" referent="746">
       <Properties>
         <string name="Name">Lobby</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -94919,7 +94960,7 @@ return {
           </CFrame>
         </OptionalCoordinateFrame>
       </Properties>
-      <Item class="Part" referent="745">
+      <Item class="Part" referent="747">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95016,7 +95057,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="746">
+      <Item class="Part" referent="748">
         <Properties>
           <string name="Name">plate</string>
           <bool name="Anchored">true</bool>
@@ -95112,7 +95153,7 @@ return {
             <Z>0</Z>
           </Vector3>
         </Properties>
-        <Item class="Texture" referent="747">
+        <Item class="Texture" referent="749">
           <Properties>
             <string name="Name">Texture</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -95137,7 +95178,7 @@ return {
           </Properties>
         </Item>
       </Item>
-      <Item class="Part" referent="748">
+      <Item class="Part" referent="750">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95234,7 +95275,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="749">
+      <Item class="Part" referent="751">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95331,7 +95372,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="750">
+      <Item class="Part" referent="752">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95428,7 +95469,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="751">
+      <Item class="Part" referent="753">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95525,7 +95566,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="752">
+      <Item class="Part" referent="754">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95622,7 +95663,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="753">
+      <Item class="Part" referent="755">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95719,7 +95760,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="754">
+      <Item class="Part" referent="756">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95816,7 +95857,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="755">
+      <Item class="Part" referent="757">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -95914,7 +95955,7 @@ return {
         </Properties>
       </Item>
     </Item>
-    <Item class="Terrain" referent="756">
+    <Item class="Terrain" referent="758">
       <Properties>
         <string name="Name">Terrain</string>
         <token name="AcquisitionMethod">0</token>
