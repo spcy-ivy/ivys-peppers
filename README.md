@@ -10,6 +10,7 @@ dont get confused when I use react shit with @rbxts/roact its based off of [this
 - [zircon](https://zircon.australis.dev/) for logging/debugging/commands
 - [promise-character](https://www.npmjs.com/package/@rbxts/promise-character) for handling all the character typing shit for me
 - [react-ts](https://github.com/littensy/rbxts-react) for react in the block
+- [pretty-react-hooks](https://www.npmjs.com/package/@rbxts/pretty-react-hooks) for providing whats in the name
 - [ripple](https://www.npmjs.com/package/@rbxts/ripple) for motion :)
 - [rust-classes](https://www.npmjs.com/package/@rbxts/rust-classes) for rust classes :)
 

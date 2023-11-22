@@ -5,13 +5,21 @@ _G.__DEV__ = true;
 import { createRoot } from "@rbxts/react-roblox";
 import Roact from "@rbxts/roact";
 import { Cards } from "../components/pepper_prompt/cards";
+import { PromptContext } from "../components/pepper_prompt/promptContext";
 
 export = (target: Instance) => {
-	const root = createRoot(target);
+  const root = createRoot(target);
 
-	root.render(<Cards enabled={true} />);
+  root.render(
+    <PromptContext.Provider value={{
+      enabled: true,
+      pressedCallback: () => print("SHIT!")
+    }}>
+      <Cards key="cards" />
+    </PromptContext.Provider>
+  );
 
-	return () => {
-		root.unmount();
-	};
+  return () => {
+    root.unmount();
+  };
 };
