@@ -3,13 +3,13 @@ declare const _G: Record<string, unknown>;
 _G.__DEV__ = true;
 
 import { createRoot } from "@rbxts/react-roblox";
-import Roact, { useState } from "@rbxts/roact";
+import Roact from "@rbxts/roact";
 import { Announcement } from "../components/announcements/announcement";
 
 export = (target: Instance) => {
   const root = createRoot(target);
 
-  root.render(<Announcement text={"science"} enabled={true} />);
+  root.render(<Announcement announcement={{ text: "demo", visible: true, id: 0 }} />);
 
   return () => {
     root.unmount();

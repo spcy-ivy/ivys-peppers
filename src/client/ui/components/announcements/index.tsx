@@ -22,7 +22,7 @@ export function Announcements() {
 
   return (
     <screengui IgnoreGuiInset={true}>
-      <Announcement text={text} enabled={enabled} />
+      <Announcement announcement={{ text: text, visible: enabled, id: 0 }} />
     </screengui>
   );
 }

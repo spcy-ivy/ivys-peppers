@@ -2,17 +2,17 @@ import Roact, { useEffect } from "@rbxts/roact";
 import colorscheme from "client/ui/utils/colorscheme";
 import { useMotion } from "client/ui/hooks/use-motion";
 import { springs } from "client/ui/utils/springs";
+import { Announcement } from "types/interfaces/Announcement";
 
 interface AnnouncementProps {
-  text?: string;
-  enabled?: boolean;
+  announcement: Announcement
 }
 
-export function Announcement({ text = "", enabled = false }: AnnouncementProps) {
+export function Announcement({ announcement = { text: "demo", visible: true, id: 0 } }: AnnouncementProps) {
   const [position, motion] = useMotion(0);
 
   useEffect(() => {
-    if (enabled) {
+    if (announcement.visible) {
       motion.spring(1, springs.gentle);
     } else {
       motion.spring(0, springs.responsive);
@@ -29,7 +29,7 @@ export function Announcement({ text = "", enabled = false }: AnnouncementProps) 
       Font={colorscheme.font}
       BackgroundColor3={colorscheme.background}
       TextColor3={colorscheme.foreground}
-      Text={text}
+      Text={announcement.text}
     >
       <uistroke
         key="stroke"
