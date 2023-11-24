@@ -9,7 +9,7 @@ import { Announcement } from "../components/announcements/announcement";
 export = (target: Instance) => {
   const root = createRoot(target);
 
-  root.render(<Announcement announcement={{ text: "demo", visible: true, id: 0 }} />);
+  root.render(<Announcement text={"demo"} enabled={true} />);
 
   return () => {
     root.unmount();

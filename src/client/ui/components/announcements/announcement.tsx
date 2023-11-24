@@ -1,23 +1,26 @@
-import Roact, { useEffect } from "@rbxts/roact";
+import Roact, { useEffect, Binding } from "@rbxts/roact";
 import colorscheme from "client/ui/utils/colorscheme";
 import { useMotion } from "client/ui/hooks/use-motion";
 import { springs } from "client/ui/utils/springs";
-import { Announcement } from "types/interfaces/Announcement";
+import { isBinding } from "@rbxts/pretty-react-hooks";
 
 interface AnnouncementProps {
-  announcement: Announcement
+  text?: string | Binding<number>
+  enabled?: boolean | Binding<boolean>
 }
 
-export function Announcement({ announcement = { text: "demo", visible: true, id: 0 } }: AnnouncementProps) {
+export function Announcement({ text = "demo", enabled = true }: AnnouncementProps) {
   const [position, motion] = useMotion(0);
 
   useEffect(() => {
-    if (announcement.visible) {
+    const appear = isBinding(enabled) ? enabled.getValue() : enabled
+
+    if (appear) {
       motion.spring(1, springs.gentle);
     } else {
       motion.spring(0, springs.responsive);
     }
-  });
+  }, [enabled]);
 
   return (
     <textlabel
@@ -29,7 +32,7 @@ export function Announcement({ announcement = { text: "demo", visible: true, id:
       Font={colorscheme.font}
       BackgroundColor3={colorscheme.background}
       TextColor3={colorscheme.foreground}
-      Text={announcement.text}
+      Text={isBinding(text) ? text.map(tostring) : text}
     >
       <uistroke
         key="stroke"

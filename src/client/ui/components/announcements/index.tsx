@@ -1,28 +1,31 @@
-import Roact, { useEffect, useState } from "@rbxts/roact";
+import Roact, { useState } from "@rbxts/roact";
 import { Announcement } from "./announcement";
 import { Events } from "client/network";
+import { useEventListener } from "@rbxts/pretty-react-hooks";
 
-// make multiple announcements be able to be stacked at once
-// look up a youtube tutorial or something
+// thats it chief you might have to make your own timer
 
 export function Announcements() {
-  const [text, setText] = useState("science!!!");
+  const [text, setText] = useState("");
   const [enabled, setEnabled] = useState(false);
 
-  useEffect(() => {
-    const connection = Events.announce.connect((text) => {
-      setText(text);
-      setEnabled(true);
-      task.wait(5);
-      setEnabled(false);
-    });
+  // disgusting hack
+  // here because I want to refresh the 5 second disable deadline when new text abruptly comes up
+  const [disablePromise, setPromise] = useState<Promise<void>>()
 
-    return () => connection.Disconnect();
-  });
+  useEventListener(Events.announce, (text: string) => {
+    setText(text);
+    setEnabled(true);
+    disablePromise?.cancel()
+    setPromise(Promise.delay(5).then(() => setEnabled(false)))
+  })
 
   return (
     <screengui IgnoreGuiInset={true}>
-      <Announcement announcement={{ text: text, visible: enabled, id: 0 }} />
+      <Announcement
+        text={text}
+        enabled={enabled}
+      />
     </screengui>
   );
 }
