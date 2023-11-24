@@ -116,7 +116,7 @@ export class RoundManager implements OnStart {
 				.catch((reason) => {
 					this.logger.Warn("round errored with reason {reason}", reason);
 				}) as Promise<Player[]>;
-			// ^^^^^^^^^^^^^^^^^^^^
+			//   ^^^^^^^^^^^^^^^^^^^^
 			// need a stupid `as` statement because APPPAARREENNTTTLYYY the fucking compiler wont stop fucking whining
 			// TS compiler is so annoying sometimes
 

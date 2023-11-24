@@ -14,6 +14,7 @@ export function Announcements() {
   const [disablePromise, setPromise] = useState<Promise<void>>()
 
   useEventListener(Events.announce, (text: string) => {
+    print(`received ${text}`)
     setText(text);
     setEnabled(true);
     disablePromise?.cancel()
@@ -21,7 +22,7 @@ export function Announcements() {
   })
 
   return (
-    <screengui IgnoreGuiInset={true}>
+    <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
       <Announcement
         text={text}
         enabled={enabled}
