@@ -1,58 +1,59 @@
-import Roact, { useEffect, useState } from "@rbxts/roact";
+import Roact, { useState } from "@rbxts/roact";
 import { Events } from "client/network";
 import { Cards } from "./cards";
 import { PepperOption } from "types/interfaces/Peppers";
+import { useEventListener } from "@rbxts/pretty-react-hooks";
+import { PromptContext } from "./promptContext";
 
 export function PepperPrompt() {
-	const [visible, setVisible] = useState(false);
-	const [enabled, setEnabled] = useState(false);
-	const [cards, setCards] = useState<PepperOption[]>([
-		{
-			icon: "",
-			name: "first",
-			description: "you didnt set this!",
-		},
-		{
-			icon: "",
-			name: "second",
-			description: "this either!",
-		},
-		{
-			icon: "",
-			name: "third",
-			description: "SET IT NOW!!!!",
-		},
-	]);
+  const [visible, setVisible] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+  const [cards, setCards] = useState<PepperOption[]>([
+    {
+      icon: "",
+      name: "first",
+      description: "you didnt set this!",
+    },
+    {
+      icon: "",
+      name: "second",
+      description: "this either!",
+    },
+    {
+      icon: "",
+      name: "third",
+      description: "SET IT NOW!!!!",
+    },
+  ]);
 
-	const disappear = (option: PepperOption) => {
-		setEnabled(false);
-		// wait for fade out animation
-		task.delay(1, () => setVisible(false));
-		Events.confirmPepper.fire(option.name);
-	};
+  useEventListener(Events.pepperPrompt, (passed_cards) => {
+    setVisible(true);
+    setEnabled(true);
+    setCards(passed_cards);
+  })
 
-	useEffect(() => {
-		const prompt_connection = Events.pepperPrompt.connect((passed_cards) => {
-			setVisible(true);
-			setEnabled(true);
-			setCards(passed_cards);
-		});
+  useEventListener(Events.cancelPepperPrompt, () => {
+    setEnabled(false);
+    // wait for fade out animation
+    task.wait(1)
+    setVisible(false)
+    task.wait(0.15)
+    setEnabled(false)
+  })
 
-		const cancel_connection = Events.cancelPepperPrompt.connect(() => {
-			setEnabled(false);
-			// wait for fade out animation
-			task.delay(1, () => setVisible(false));
-		});
-
-		return () => {
-			prompt_connection.Disconnect();
-			cancel_connection.Disconnect();
-		};
-	});
-
-	return (
-		<screengui Enabled={visible} IgnoreGuiInset={true} ResetOnSpawn={false}>
-			<Cards enabled={enabled} cards={cards} pressedCallback={disappear} />
-		</screengui>
-	);
+  return (
+    <PromptContext.Provider value={{
+      enabled: enabled,
+      pressedCallback: (option: PepperOption) => {
+        setEnabled(false);
+        // wait for fade out animation
+        task.delay(1, () => setVisible(false));
+        Events.confirmPepper.fire(option.name)
+      }
+    }}>
+      {visible && <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
+        <Cards cards={cards} />
+      </screengui>}
+    </PromptContext.Provider>
+  );
 }
