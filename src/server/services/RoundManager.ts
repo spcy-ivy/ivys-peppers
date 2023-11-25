@@ -7,9 +7,12 @@ import { Events } from "server/network";
 import { gamemodes } from "server/gamemodes";
 import { peppers } from "server/peppers";
 import { store } from "server/store";
-import { selectVariant } from "server/store/lobbyVariants";
 
 // i really want to split this up but cant because then itd be unnecessary abstraction
+// "wahh wahhh each piece of code should only do one job wahh wahh" SHUT UP!!!!!
+// I NEED THIS ALL IN ONE MODULE SO THAT NAVIGATION ISNT A PAIN!!!!! I DONT WANT TO JUMP BETWEEN ONE MILLION SCRIPTS JUST TO GET WHAT HAPPENS IN **ONE ROUND**
+// USE BIG FILES LIKE A REAL MAN!!!! EVERYTHING IS CONNECTED!!!!
+//
 // why is being a programmer so painful
 
 @Service()
@@ -22,8 +25,10 @@ export class RoundManager implements OnStart {
 	private canApplyPepper = false;
 	private pepperApplied: Player[] = [];
 
+	private variant: Option<string> = Option.none();
+	private variantNames: string[] = [];
 	private lobby: Model = Workspace.Lobby;
-	private loadedVariant: Option<Model> = Option.none();
+	private variantModel: Option<Model> = Option.none();
 	private variants = ServerScriptService.Maps.lobby_variants;
 
 	private automatedRound: Option<Promise<Player[]>> = Option.none();
@@ -37,6 +42,8 @@ export class RoundManager implements OnStart {
 		for (const [key, _value] of pairs(gamemodes)) {
 			this.gamemodeNames.push(key);
 		}
+
+		this.variants.GetChildren().forEach((map) => this.variantNames.push(map.Name));
 	}
 
 	onStart() {
@@ -54,38 +61,6 @@ export class RoundManager implements OnStart {
 			});
 		});
 
-		// HACKY AND TERRIBLE CODE AHEAD!!! BEWARE!!
-		// wont revise because im lazy
-		store.subscribe(selectVariant, (variant) => {
-			if (variant.isNone()) {
-				this.logger.Info("load the lobby!!");
-
-				if (this.loadedVariant.isSome()) {
-					this.loadedVariant.unwrap().Destroy();
-					this.loadedVariant = Option.none();
-				}
-
-				this.lobby.Parent = Workspace;
-				return;
-			}
-
-			const map = this.variants.FindFirstChild(variant.unwrap());
-
-			if (!map) {
-				this.logger.Warn(
-					`for some sick and twisted reason a registered variant wasnt in the folder, wont load, cursed variant was ${variant.unwrap()}`,
-				);
-				return;
-			}
-
-			const clone = map.Clone();
-			this.loadedVariant = Option.some(clone as Model);
-			clone.Parent = Workspace;
-			this.lobby.Parent = undefined;
-
-			this.logger.Info("loaded variant {variant}!!!!", variant.unwrap());
-		});
-
 		this.BeginAutomation();
 	}
 
@@ -98,7 +73,6 @@ export class RoundManager implements OnStart {
 				task.wait(5);
 			} while (Players.GetPlayers().size() < 2);
 
-			// dunno if cancelling this will exactly work... but cant live life without risk
 			const round = new Promise((resolve, _reject, onCancel) => {
 				onCancel(() => {
 					this.canApplyPepper = false;
@@ -138,7 +112,7 @@ export class RoundManager implements OnStart {
 	private StopGamemode() {
 		store.clearSurvivors();
 		this.winCondition = Option.none();
-		store.setDefaultLobby();
+		this.SetDefaultVariant();
 
 		Players.GetPlayers().forEach((player) => {
 			if (!player.Character) return;
@@ -221,5 +195,56 @@ export class RoundManager implements OnStart {
 
 		this.canApplyPepper = false;
 		Events.cancelPepperPrompt.broadcast();
+	}
+
+	private UpdateVariantModel() {
+		if (this.variant.isNone()) {
+			this.logger.Info("load the lobby!!");
+
+			if (this.variantModel.isSome()) {
+				this.variantModel.unwrap().Destroy();
+				this.variantModel = Option.none();
+			}
+
+			this.lobby.Parent = Workspace;
+			return;
+		}
+
+		const map = this.variants.FindFirstChild(this.variant.unwrap());
+
+		if (!map) {
+			this.logger.Warn(
+				`for some sick and twisted reason a registered variant wasnt in the folder, wont load, cursed variant was ${this.variant.unwrap()}`,
+			);
+			return;
+		}
+
+		const clone = map.Clone();
+		this.variantModel = Option.some(clone as Model);
+		clone.Parent = Workspace;
+		this.lobby.Parent = undefined;
+
+		this.logger.Info("loaded variant {variant}!!!!", this.variant.unwrap());
+	}
+
+	public SetVariant(variant: string) {
+		if (!this.variantNames.includes(variant)) {
+			this.logger.Warn(`${variant} is not a lobby variant!`);
+			return;
+		}
+
+		this.variant = Option.some(variant);
+		this.UpdateVariantModel();
+	}
+
+	public SetRandomVariant() {
+		// why minus one??? I DONT KNOW!!! IT JUST WORKS!!! DONT TOUCH IT!!!!
+		// also probably because .size() returns a value one larger than actual size
+		this.SetVariant(this.variantNames[math.random(0, this.variantNames.size() - 1)]);
+	}
+
+	public SetDefaultVariant() {
+		this.variant = Option.none();
+		this.UpdateVariantModel();
 	}
 }
