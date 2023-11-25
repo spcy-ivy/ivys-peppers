@@ -50,6 +50,9 @@
       "Lobby": {
 			  "$path": "assets/workspace/lobby.rbxmx"
       },
+      "Borders": {
+			  "$path": "assets/workspace/borders.rbxmx"
+      },
       "Terrain": {
         "$path": "assets/workspace/terrain.rbxmx"
       },

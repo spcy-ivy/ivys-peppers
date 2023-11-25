@@ -5,6 +5,8 @@ import { RoundManager } from "./RoundManager";
 import { Events } from "server/network";
 import { store } from "server/store";
 
+// extremely ugly and unreadable code ahead... BEWARE!!
+
 @Service()
 export class ZirconProvider implements OnInit {
 	public constructor(private readonly logger: Logger, private readonly roundManager: RoundManager) {}
@@ -32,6 +34,8 @@ export class ZirconProvider implements OnInit {
 				.AddFunction(this.SetAllSurvivors, [ZirconDefaultGroup.Admin])
 				.AddFunction(this.BeginAutomation, [ZirconDefaultGroup.Admin])
 				.AddFunction(this.CancelAutomation, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.SetVariant, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.SetLobby, [ZirconDefaultGroup.Admin])
 				.Build(),
 		);
 	}
@@ -88,5 +92,13 @@ export class ZirconProvider implements OnInit {
 
 	private CancelAutomation = new ZirconFunctionBuilder("cancel_automation").Bind((_context) => {
 		this.roundManager.CancelAutomation();
+	});
+
+	private SetVariant = new ZirconFunctionBuilder("set_variant").AddArgument("string").Bind((_context, variant) => {
+		this.roundManager.SetVariant(variant);
+	});
+
+	private SetLobby = new ZirconFunctionBuilder("set_lobby").Bind((_context) => {
+		this.roundManager.SetDefaultVariant();
 	});
 }

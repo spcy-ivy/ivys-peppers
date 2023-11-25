@@ -29,6 +29,7 @@ target:
     assets:
       - assets/images/icons/tabasco.png
       - assets/images/icons/bell_pepper.png
+      - assets/images/icons/ghost_pepper.png
       - assets/images/icons/jalapeno.png
       - assets/images/icons/carolina_reaper.png
       - assets/images/card_background.png

@@ -3,18 +3,16 @@ import { Announcement } from "./announcement";
 import { Events } from "client/network";
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 
-// thats it chief you might have to make your own timer
-
 export function Announcements() {
   const [text, setText] = useState("");
   const [enabled, setEnabled] = useState(false);
 
-  // disgusting hack
+  // disgusting hack, not an elegant solution at all.
   // here because I want to refresh the 5 second disable deadline when new text abruptly comes up
+  // this is the simplest solution I could find though, so it stays
   const [disablePromise, setPromise] = useState<Promise<void>>()
 
   useEventListener(Events.announce, (text: string) => {
-    print(`received ${text}`)
     setText(text);
     setEnabled(true);
     disablePromise?.cancel()
