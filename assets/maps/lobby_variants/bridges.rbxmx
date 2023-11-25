@@ -31,7 +31,7 @@
 			<token name="ModelStreamingMode">0</token>
 			<string name="Name">bridges</string>
 			<bool name="NeedsPivotMigration">false</bool>
-			<Ref name="PrimaryPart">null</Ref>
+			<Ref name="PrimaryPart">RBX50EE7983DAE4471781D5A5D612A1EA9B</Ref>
 			<float name="ScaleFactor">1</float>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
@@ -66,7 +66,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>4.99998999</Y>
+					<Y>11.4999905</Y>
 					<Z>-22.5</Z>
 					<R00>0</R00>
 					<R01>0</R01>
@@ -164,7 +164,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>22.5</X>
-					<Y>0.249989986</Y>
+					<Y>6.74998999</Y>
 					<Z>-22.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -262,7 +262,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>22.5</X>
-					<Y>1.25</Y>
+					<Y>7.75</Y>
 					<Z>-28.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -359,7 +359,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>22.5</X>
-					<Y>4.99998999</Y>
+					<Y>11.4999905</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -457,7 +457,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>22.5</X>
-					<Y>-5.50000286</Y>
+					<Y>0.999997139</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -555,7 +555,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>-22.5</X>
-					<Y>4.99998999</Y>
+					<Y>11.4999905</Y>
 					<Z>0</Z>
 					<R00>-1</R00>
 					<R01>0</R01>
@@ -653,7 +653,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>-22.5</X>
-					<Y>0.249989986</Y>
+					<Y>6.74998999</Y>
 					<Z>-22.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -751,7 +751,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>-5.50000286</Y>
+					<Y>0.999997139</Y>
 					<Z>-22.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -849,7 +849,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>-28.5</X>
-					<Y>1.25</Y>
+					<Y>7.75</Y>
 					<Z>-22.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -946,7 +946,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>22.5</X>
-					<Y>0.249989986</Y>
+					<Y>6.74998999</Y>
 					<Z>22.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -1044,7 +1044,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>28.5</X>
-					<Y>1.25</Y>
+					<Y>7.75</Y>
 					<Z>22.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -1141,7 +1141,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>-5.50000286</Y>
+					<Y>0.999997139</Y>
 					<Z>22.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -1239,7 +1239,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>4.99998999</Y>
+					<Y>11.4999905</Y>
 					<Z>22.5</Z>
 					<R00>0</R00>
 					<R01>0</R01>
@@ -1337,7 +1337,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>-22.5</X>
-					<Y>-5.50000286</Y>
+					<Y>0.999997139</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -1435,7 +1435,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>-22.5</X>
-					<Y>0.249989986</Y>
+					<Y>6.74998999</Y>
 					<Z>22.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -1533,7 +1533,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>-22.5</X>
-					<Y>1.25</Y>
+					<Y>7.75</Y>
 					<Z>28.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -1630,7 +1630,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>-6.5</Y>
+					<Y>0</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -1751,7 +1751,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>-4.50000191</Y>
+					<Y>1.99999809</Y>
 					<Z>-0.25</Z>
 					<R00>1</R00>
 					<R01>0</R01>
