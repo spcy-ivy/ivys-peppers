@@ -198,13 +198,13 @@ export class RoundManager implements OnStart {
 	}
 
 	private UpdateVariantModel() {
+		if (this.variantModel.isSome()) {
+			this.variantModel.unwrap().Destroy();
+			this.variantModel = Option.none();
+		}
+
 		if (this.variant.isNone()) {
 			this.logger.Info("load the lobby!!");
-
-			if (this.variantModel.isSome()) {
-				this.variantModel.unwrap().Destroy();
-				this.variantModel = Option.none();
-			}
 
 			this.lobby.Parent = Workspace;
 			return;
