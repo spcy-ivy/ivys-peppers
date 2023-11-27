@@ -1,0 +1,21 @@
+{
+  "ClassName": "Part",
+  "Properties": {
+    "Size": [1.762, 0.571, 5.027]
+  },
+
+  "Children":
+	[
+		{
+			"Name": "Mesh",
+			"ClassName": "SpecialMesh",
+
+			"Properties":
+			{
+				"Scale": [0.25, 0.25, 0.25],
+				"MeshId": "rbxassetid://6204245292",
+				"TextureId": "rbxassetid://6204245562"
+			}
+		}
+	]
+}

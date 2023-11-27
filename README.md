@@ -35,7 +35,7 @@ dont get confused when I use react shit with @rbxts/roact its based off of [this
         <tr>
             <td>
                 <h3>@syyivi</h3>
-                <p>owner, programmer, the overworked student in question</p>
+                <p>programmer, the overworked student in question</p>
             </td>
             <td>
                 <h3>@pnmpki</h3>
