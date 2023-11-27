@@ -13,7 +13,7 @@ export = (target: Instance) => {
   root.render(
     <PromptContext.Provider value={{
       enabled: true,
-      pressedCallback: () => print("SHIT!")
+      pressedCallback: () => print("awhahwhahahwhahwahha")
     }}>
       <Cards key="cards" />
     </PromptContext.Provider>

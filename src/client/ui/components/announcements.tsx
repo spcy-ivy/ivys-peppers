@@ -1,8 +1,9 @@
-import Roact, { useEffect, Binding } from "@rbxts/roact";
-import colorscheme from "client/ui/utils/colorscheme";
-import { useMotion } from "client/ui/hooks/use-motion";
-import { springs } from "client/ui/utils/springs";
-import { isBinding } from "@rbxts/pretty-react-hooks";
+import Roact, { useState, Binding, useEffect } from "@rbxts/roact";
+import { Events } from "client/network";
+import { isBinding, useEventListener } from "@rbxts/pretty-react-hooks";
+import { useMotion } from "../hooks/use-motion";
+import { springs } from "../utils/springs";
+import colorscheme from "../utils/colorscheme";
 
 interface AnnouncementProps {
   text?: string | Binding<number>
@@ -43,5 +44,31 @@ export function Announcement({ text = "demo", enabled = true }: AnnouncementProp
       />
       <uiaspectratioconstraint key="aspectratio" AspectRatio={4} />
     </textlabel>
+  );
+}
+
+export function Announcements() {
+  const [text, setText] = useState("");
+  const [enabled, setEnabled] = useState(false);
+
+  // disgusting hack, not an elegant solution at all.
+  // here because I want to refresh the 5 second disable deadline when new text abruptly comes up
+  // this is the simplest solution I could find though, so it stays
+  const [disablePromise, setPromise] = useState<Promise<void>>()
+
+  useEventListener(Events.announce, (text: string) => {
+    setText(text);
+    setEnabled(true);
+    disablePromise?.cancel()
+    setPromise(Promise.delay(5).then(() => setEnabled(false)))
+  })
+
+  return (
+    <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
+      <Announcement
+        text={text}
+        enabled={enabled}
+      />
+    </screengui>
   );
 }

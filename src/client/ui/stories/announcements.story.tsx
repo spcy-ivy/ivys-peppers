@@ -4,7 +4,7 @@ _G.__DEV__ = true;
 
 import { createRoot } from "@rbxts/react-roblox";
 import Roact from "@rbxts/roact";
-import { Announcement } from "../components/announcements/announcement";
+import { Announcement } from "../components/announcements";
 
 export = (target: Instance) => {
   const root = createRoot(target);
