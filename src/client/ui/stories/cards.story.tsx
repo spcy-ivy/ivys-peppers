@@ -11,12 +11,14 @@ export = (target: Instance) => {
   const root = createRoot(target);
 
   root.render(
-    <PromptContext.Provider value={{
-      enabled: true,
-      pressedCallback: () => print("awhahwhahahwhahwahha")
-    }}>
+    <PromptContext.Provider
+      value={{
+        enabled: true,
+        pressedCallback: () => print("awhahwhahahwhahwahha"),
+      }}
+    >
       <Cards key="cards" />
-    </PromptContext.Provider>
+    </PromptContext.Provider>,
   );
 
   return () => {

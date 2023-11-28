@@ -43,12 +43,18 @@ export class RoundManager implements OnStart {
 			this.gamemodeNames.push(key);
 		}
 
-		this.variants.GetChildren().forEach((map) => this.variantNames.push(map.Name));
+		this.variants
+			.GetChildren()
+			.forEach((map) => this.variantNames.push(map.Name));
 	}
 
 	onStart() {
 		Events.confirmPepper.connect((player, pepperName) => {
-			this.logger.Info("{player} attempted to apply {pepper}", player, pepperName);
+			this.logger.Info(
+				"{player} attempted to apply {pepper}",
+				player,
+				pepperName,
+			);
 
 			if (!this.canApplyPepper) return;
 			if (!(pepperName in peppers)) return;
@@ -86,9 +92,14 @@ export class RoundManager implements OnStart {
 			})
 				.andThenCall(Promise.delay, 5)
 				.andThenCall(() => this.RandomGamemode())
-				.then((survivors) => new Promise((resolve) => resolve(survivors)))
+				.then(
+					(survivors) => new Promise((resolve) => resolve(survivors)),
+				)
 				.catch((reason) => {
-					this.logger.Warn("round errored with reason {reason}", reason);
+					this.logger.Warn(
+						"round errored with reason {reason}",
+						reason,
+					);
 				}) as Promise<Player[]>;
 			//   ^^^^^^^^^^^^^^^^^^^^
 			// need a stupid `as` statement because APPPAARREENNTTTLYYY the fucking compiler wont stop fucking whining
@@ -140,11 +151,16 @@ export class RoundManager implements OnStart {
 
 		const winnersPromise = this.winCondition.unwrap();
 
-		winnersPromise.catch((err) => this.logger.Error("Gamemode caught error: {error}", err));
+		winnersPromise.catch((err) =>
+			this.logger.Error("Gamemode caught error: {error}", err),
+		);
 		const winners = winnersPromise.expect();
 
 		this.StopGamemode();
-		this.logger.Info("Finished testing! The winners are {winners}", winners);
+		this.logger.Info(
+			"Finished testing! The winners are {winners}",
+			winners,
+		);
 		return winners ? winners : [];
 	}
 
@@ -159,7 +175,8 @@ export class RoundManager implements OnStart {
 	}
 
 	public RandomGamemode(): Player[] {
-		const randomGamemode = () => this.gamemodeNames[math.random(0, this.gamemodeNames.size() - 1)];
+		const randomGamemode = () =>
+			this.gamemodeNames[math.random(0, this.gamemodeNames.size() - 1)];
 		return this.RunGamemode(randomGamemode());
 	}
 
@@ -184,12 +201,20 @@ export class RoundManager implements OnStart {
 		// oh my god lord forgive me for this heresy
 		// APPARENTLY when it compiles it adds 1 so I have to negate the random params :(
 		const randomPepper = () =>
-			peppers[this.pepperNames[math.random(0, this.pepperNames.size() - 1)] as keyof typeof peppers];
+			peppers[
+				this.pepperNames[
+					math.random(0, this.pepperNames.size() - 1)
+				] as keyof typeof peppers
+			];
 
 		this.canApplyPepper = true;
 
 		// this hurts me more than it hurts you
-		Events.pepperPrompt.broadcast([randomPepper().option, randomPepper().option, randomPepper().option]);
+		Events.pepperPrompt.broadcast([
+			randomPepper().option,
+			randomPepper().option,
+			randomPepper().option,
+		]);
 
 		task.wait(5);
 
@@ -240,7 +265,9 @@ export class RoundManager implements OnStart {
 	public SetRandomVariant() {
 		// why minus one??? I DONT KNOW!!! IT JUST WORKS!!! DONT TOUCH IT!!!!
 		// also probably because .size() returns a value one larger than actual size
-		this.SetVariant(this.variantNames[math.random(0, this.variantNames.size() - 1)]);
+		this.SetVariant(
+			this.variantNames[math.random(0, this.variantNames.size() - 1)],
+		);
 	}
 
 	public SetDefaultVariant() {

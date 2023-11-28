@@ -7,11 +7,11 @@ import Roact from "@rbxts/roact";
 import { Announcement } from "../components/announcements";
 
 export = (target: Instance) => {
-  const root = createRoot(target);
+	const root = createRoot(target);
 
-  root.render(<Announcement text={"demo"} enabled={true} />);
+	root.render(<Announcement text={"demo"} enabled={true} />);
 
-  return () => {
-    root.unmount();
-  };
+	return () => {
+		root.unmount();
+	};
 };

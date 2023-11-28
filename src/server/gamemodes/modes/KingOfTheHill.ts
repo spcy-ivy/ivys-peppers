@@ -14,7 +14,9 @@ async function winCondition(): Promise<Player[]> {
 		.iter()
 		.forEach((player) => {
 			const model = player.Character || player.CharacterAdded.Wait()[0];
-			promiseR6(model).then((character) => (hammer.Clone().Parent = character));
+			promiseR6(model).then(
+				(character) => (hammer.Clone().Parent = character),
+			);
 		});
 
 	return endGamePromise;

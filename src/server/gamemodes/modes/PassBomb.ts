@@ -31,7 +31,9 @@ async function winCondition(): Promise<Player[]> {
 		const random = survivors.get(math.random(0, survivors.len() - 1));
 
 		if (random.isNone()) {
-			Log.Error("lmao apparently we errored trying to select a player???");
+			Log.Error(
+				"lmao apparently we errored trying to select a player???",
+			);
 			endGame.Fire();
 			return;
 		}
@@ -84,7 +86,11 @@ async function winCondition(): Promise<Player[]> {
 				explosion.Position = bomb.Handle.Position;
 				explosion.Parent = Workspace;
 
-				endGame.Fire(...survivors.retain((current) => current !== assigned.unwrap()).asPtr());
+				endGame.Fire(
+					...survivors
+						.retain((current) => current !== assigned.unwrap())
+						.asPtr(),
+				);
 			} else {
 				Log.Error("cant get person holding bomb so NOBODY wins!!!");
 				endGame.Fire();

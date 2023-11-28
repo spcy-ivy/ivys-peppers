@@ -8,7 +8,11 @@ import { store } from "server/store";
 import { selectSurvivors } from "server/store/survivors";
 import Log from "@rbxts/log";
 
-export function initializeGamemode(): [Janitor<void>, Signal<Player[]>, Promise<Player[]>] {
+export function initializeGamemode(): [
+	Janitor<void>,
+	Signal<Player[]>,
+	Promise<Player[]>,
+] {
 	const endGame = new Signal<Player[]>();
 	const obliterator = new Janitor();
 
@@ -48,19 +52,25 @@ export function initializeGamemode(): [Janitor<void>, Signal<Player[]>, Promise<
 		);
 	});
 
-	obliterator.Add(Players.PlayerRemoving.Connect((player) => store.removeSurvivor(player)));
+	obliterator.Add(
+		Players.PlayerRemoving.Connect((player) =>
+			store.removeSurvivor(player),
+		),
+	);
 
-	const endGamePromise = new Promise<Player[]>((resolve, _reject, onCancel) => {
-		onCancel(() => {
-			Log.Info("gamemode has been cancelled!");
+	const endGamePromise = new Promise<Player[]>(
+		(resolve, _reject, onCancel) => {
+			onCancel(() => {
+				Log.Info("gamemode has been cancelled!");
+				obliterator.Destroy();
+			});
+
+			const winners = endGame.Wait();
 			obliterator.Destroy();
-		});
 
-		const winners = endGame.Wait();
-		obliterator.Destroy();
-
-		resolve(winners);
-	});
+			resolve(winners);
+		},
+	);
 
 	return [obliterator, endGame, endGamePromise];
 }

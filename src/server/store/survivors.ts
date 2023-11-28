@@ -38,4 +38,5 @@ export const survivorsSlice = createProducer(initialState, {
 	}),
 });
 
-export const selectSurvivors = (state: ServerState) => state.survivorsSlice.survivors;
+export const selectSurvivors = (state: ServerState) =>
+	state.survivorsSlice.survivors;
