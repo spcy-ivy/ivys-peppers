@@ -6,6 +6,7 @@ import { useEventListener } from "@rbxts/pretty-react-hooks";
 import { PromptContext } from "./promptContext";
 
 export function PepperPrompt() {
+  // TODO: swap the usage of visible and enabled because jesus its confusing
   const [visible, setVisible] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [cards, setCards] = useState<PepperOption[]>([
@@ -30,30 +31,34 @@ export function PepperPrompt() {
     setVisible(true);
     setEnabled(true);
     setCards(passed_cards);
-  })
+  });
 
   useEventListener(Events.cancelPepperPrompt, () => {
     setEnabled(false);
     // wait for fade out animation
-    task.wait(1)
-    setVisible(false)
-    task.wait(0.15)
-    setEnabled(false)
-  })
+    task.wait(1);
+    setVisible(false);
+    task.wait(0.15);
+    setEnabled(false);
+  });
 
   return (
-    <PromptContext.Provider value={{
-      enabled: enabled,
-      pressedCallback: (option: PepperOption) => {
-        setEnabled(false);
-        // wait for fade out animation
-        task.delay(1, () => setVisible(false));
-        Events.confirmPepper.fire(option.name)
-      }
-    }}>
-      {visible && <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
-        <Cards cards={cards} />
-      </screengui>}
+    <PromptContext.Provider
+      value={{
+        enabled: enabled,
+        pressedCallback: (option: PepperOption) => {
+          setEnabled(false);
+          // wait for fade out animation
+          task.delay(1, () => setVisible(false));
+          Events.confirmPepper.fire(option.name);
+        },
+      }}
+    >
+      {visible && (
+        <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
+          <Cards cards={cards} />
+        </screengui>
+      )}
     </PromptContext.Provider>
   );
 }

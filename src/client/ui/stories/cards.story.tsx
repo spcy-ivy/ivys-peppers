@@ -8,18 +8,20 @@ import { Cards } from "../components/pepper_prompt/cards";
 import { PromptContext } from "../components/pepper_prompt/promptContext";
 
 export = (target: Instance) => {
-  const root = createRoot(target);
+	const root = createRoot(target);
 
-  root.render(
-    <PromptContext.Provider value={{
-      enabled: true,
-      pressedCallback: () => print("SHIT!")
-    }}>
-      <Cards key="cards" />
-    </PromptContext.Provider>
-  );
+	root.render(
+		<PromptContext.Provider
+			value={{
+				enabled: true,
+				pressedCallback: () => print("awhahwhahahwhahwahha"),
+			}}
+		>
+			<Cards key="cards" />
+		</PromptContext.Provider>,
+	);
 
-  return () => {
-    root.unmount();
-  };
+	return () => {
+		root.unmount();
+	};
 };

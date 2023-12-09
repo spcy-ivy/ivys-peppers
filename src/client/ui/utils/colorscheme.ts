@@ -36,4 +36,5 @@ export = {
 	indigo: colors.base0E,
 	violet: colors.base0F,
 	font: Enum.Font.GothamMedium,
+	fontAsset: "rbxasset://fonts/families/GothamSSm.json",
 };

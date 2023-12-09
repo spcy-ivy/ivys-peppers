@@ -4,33 +4,32 @@ _G.__DEV__ = true;
 
 import { createRoot } from "@rbxts/react-roblox";
 import Roact, { useState } from "@rbxts/roact";
-import { Announcement } from "../components/announcements";
+import { Tiles, TransitionContext } from "../components/transition";
 import { useEventListener } from "@rbxts/pretty-react-hooks";
 import { UserInputService } from "@rbxts/services";
 
-function AnnouncementStory() {
-	const [enabled, setEnabled] = useState(true);
+function TransitionStory() {
+	const [visible, setVisible] = useState(true);
 
 	useEventListener(UserInputService.InputBegan, (input: InputObject) => {
 		if (input.UserInputType !== Enum.UserInputType.MouseButton1) {
 			return;
 		}
 
-		setEnabled(!enabled);
+		setVisible(!visible);
 	});
 
 	return (
-		<Announcement
-			text={"wenomechainsama tumajarbisaun"}
-			enabled={enabled}
-		/>
+		<TransitionContext.Provider value={{ visible: visible }}>
+			<Tiles key="tiles" />
+		</TransitionContext.Provider>
 	);
 }
 
 export = (target: Instance) => {
 	const root = createRoot(target);
 
-	root.render(<AnnouncementStory />);
+	root.render(<TransitionStory />);
 
 	return () => {
 		root.unmount();

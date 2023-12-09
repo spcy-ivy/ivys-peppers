@@ -4,6 +4,7 @@ interface ServerScriptService {
 			Handle: MeshPart;
 		};
 		sword: Tool;
+		hammer: Tool;
 	};
 	Maps: Folder & {
 		lobby_variants: Folder;

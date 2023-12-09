@@ -6,4 +6,7 @@ interface PromptContext {
 	pressedCallback: (option: PepperOption) => void;
 }
 
-export const PromptContext = createContext({} as PromptContext);
+export const PromptContext = createContext<PromptContext>({
+	enabled: true,
+	pressedCallback: () => print("no callback yet!"),
+});
