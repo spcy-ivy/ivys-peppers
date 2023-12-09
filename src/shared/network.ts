@@ -7,13 +7,26 @@ interface ClientToServerEvents {
 
 interface ServerToClientEvents {
 	announce(text: string): void;
+
 	pepperPrompt(cards: PepperOption[]): void;
 	cancelPepperPrompt(): void;
+
+	transition(): void;
+	cancelTransition(): void;
+
+	startTimer(value: number): void;
+	stopTimer(): void;
 }
 
 interface ClientToServerFunctions {}
 
 interface ServerToClientFunctions {}
 
-export const GlobalEvents = Networking.createEvent<ClientToServerEvents, ServerToClientEvents>();
-export const GlobalFunctions = Networking.createFunction<ClientToServerFunctions, ServerToClientFunctions>();
+export const GlobalEvents = Networking.createEvent<
+	ClientToServerEvents,
+	ServerToClientEvents
+>();
+export const GlobalFunctions = Networking.createFunction<
+	ClientToServerFunctions,
+	ServerToClientFunctions
+>();

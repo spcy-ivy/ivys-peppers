@@ -4,6 +4,8 @@ import Roact, { StrictMode } from "@rbxts/roact";
 import { Players } from "@rbxts/services";
 import { Announcements } from "client/ui/components/announcements";
 import { PepperPrompt } from "client/ui/components/pepper_prompt";
+import { Timer } from "client/ui/components/timer";
+import { Transition } from "client/ui/components/transition";
 
 @Controller()
 export class UI implements OnStart {
@@ -16,6 +18,8 @@ export class UI implements OnStart {
         <StrictMode>
           <Announcements />
           <PepperPrompt />
+          <Transition />
+          <Timer />
         </StrictMode>,
         target,
       ),
