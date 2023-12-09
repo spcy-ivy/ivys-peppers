@@ -4,12 +4,27 @@ _G.__DEV__ = true;
 
 import { createRoot } from "@rbxts/react-roblox";
 import Roact from "@rbxts/roact";
-import { Timer } from "../components/timer";
+import { Display, useCountdown } from "../components/timer";
+import { useMountEffect } from "@rbxts/pretty-react-hooks";
+
+function DisplayStory() {
+  const countdown = useCountdown();
+
+  useMountEffect(() => {
+    // print("DO YOU WORK?!?!?!?")
+    countdown.setTime(10);
+    countdown.start();
+  })
+
+  return (
+    <Display epoch={countdown.value} />
+  )
+}
 
 export = (target: Instance) => {
   const root = createRoot(target);
 
-  root.render(<Timer />);
+  root.render(<DisplayStory />);
 
   return () => {
     root.unmount();

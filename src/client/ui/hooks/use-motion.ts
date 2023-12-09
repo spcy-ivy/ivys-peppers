@@ -1,22 +1,25 @@
-// all credit to: https://github.com/littensy/rbxts-react-example/blob/main/src/client/hooks/use-motion.ts
-
-import { createMotion, Motion, MotionGoal } from "@rbxts/ripple";
 import { Binding, useBinding, useEffect, useMemo } from "@rbxts/roact";
+import { MotionOptions, Motion, MotionGoal, createMotion } from "@rbxts/ripple";
 
 export function useMotion(
-	goal: number,
+	initialValue: number,
+	options?: MotionOptions,
 ): LuaTuple<[Binding<number>, Motion<number>]>;
 
 export function useMotion<T extends MotionGoal>(
-	goal: T,
+	initialValue: T,
+	options?: MotionOptions,
 ): LuaTuple<[Binding<T>, Motion<T>]>;
 
-export function useMotion<T extends MotionGoal>(goal: T) {
+export function useMotion<T extends MotionGoal>(
+	initialValue: T,
+	options: MotionOptions = { start: true },
+) {
 	const motion = useMemo(() => {
-		return createMotion(goal, { start: true });
+		return createMotion(initialValue, options);
 	}, []);
 
-	const [binding, setValue] = useBinding(motion.get());
+	const [binding, setValue] = useBinding(initialValue);
 
 	useEffect(() => {
 		const disconnect = motion.onStep(setValue);

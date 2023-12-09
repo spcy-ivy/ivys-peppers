@@ -100,8 +100,10 @@ async function winCondition(): Promise<Player[]> {
 
 	lobbyVariant();
 	assign_bomb_to_random();
+	Events.startTimer.broadcast(round_length);
 
 	return endGamePromise.tap(() => {
+		Events.stopTimer.broadcast();
 		task.wait(1); // waits so that the players can see who won
 		Events.announce.broadcast(`${assigned.unwrap()} has lost!`);
 	});

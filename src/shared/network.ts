@@ -13,6 +13,9 @@ interface ServerToClientEvents {
 
 	transition(): void;
 	cancelTransition(): void;
+
+	startTimer(value: number): void;
+	stopTimer(): void;
 }
 
 interface ClientToServerFunctions {}

@@ -29,6 +29,7 @@ export function Announcement({
 	return (
 		<textlabel
 			TextScaled={true}
+			AutomaticSize={Enum.AutomaticSize.X}
 			AnchorPoint={Vector2.xAxis.mul(0.5)}
 			Position={position.map((alpha) =>
 				UDim2.fromScale(0.5, -0.1).Lerp(
@@ -38,10 +39,7 @@ export function Announcement({
 			)}
 			Transparency={position.map((alpha) => 1 - alpha)}
 			Size={position.map((alpha) =>
-				UDim2.fromScale(0.1, 0.1).Lerp(
-					UDim2.fromScale(0.2, 0.2),
-					alpha,
-				),
+				UDim2.fromScale(0, 0).Lerp(UDim2.fromScale(0, 0.1), alpha),
 			)}
 			Font={colorscheme.font}
 			BackgroundColor3={colorscheme.background}
@@ -55,7 +53,6 @@ export function Announcement({
 				Color={colorscheme.selection_background}
 				Thickness={3}
 			/>
-			<uiaspectratioconstraint key="aspectratio" AspectRatio={4} />
 		</textlabel>
 	);
 }

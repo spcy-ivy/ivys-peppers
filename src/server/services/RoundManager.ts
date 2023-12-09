@@ -91,7 +91,12 @@ export class RoundManager implements OnStart {
 				resolve(undefined);
 			})
 				.andThenCall(Promise.delay, 5)
+				// hhhhhhhhhhhh have to do this stinky arrow syntax bc the compiler wont stop WHINING
+				.andThenCall(() => Events.transition.broadcast())
+				.andThenCall(Promise.delay, 1.5)
+				.andThenCall(() => Events.cancelTransition.broadcast())
 				.andThenCall(() => this.RandomGamemode())
+				// hacky and bad... but it works...
 				.then(
 					(survivors) => new Promise((resolve) => resolve(survivors)),
 				)
@@ -125,10 +130,15 @@ export class RoundManager implements OnStart {
 		this.winCondition = Option.none();
 		this.SetDefaultVariant();
 
+		Events.transition.broadcast();
+		task.wait(1.5);
+
 		Players.GetPlayers().forEach((player) => {
 			if (!player.Character) return;
 			player.LoadCharacter();
 		});
+
+		Events.cancelTransition.broadcast();
 	}
 
 	public RunGamemode(gamemode: string): Player[] {

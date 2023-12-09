@@ -10,7 +10,7 @@ import { useMotion } from "../hooks/use-motion";
 // very ugly code structure
 
 // in pixels
-const tileSize = 50;
+const tileSize = 75;
 
 interface TransitionContext {
   visible: boolean;
@@ -55,6 +55,8 @@ function Tile({ x = 0, y = 0 }: TileProps) {
       BackgroundColor3={Color3.fromRGB(0, 0, 0)}
       AnchorPoint={Vector2.one.mul(0.5)}
       BorderSizePixel={0}
+      // 999 otherwise it breaks immersion
+      ZIndex={999}
     />
   );
 }
@@ -64,7 +66,7 @@ function TileFragment({ columns = 50, rows = 25 }: TileFragmentProps) {
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
-      tiles.push(<Tile x={x} y={y} />);
+      tiles.push(<Tile key={`tile_x${x}_y${y}`} x={x} y={y} />);
     }
   }
 

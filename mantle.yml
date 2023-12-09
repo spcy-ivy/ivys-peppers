@@ -9,6 +9,7 @@ environments:
 
 target:
   experience:
+    icon: assets/images/marketing/game_icon.png
     configuration:
       genre: all
       playableDevices: [computer, phone, tablet]
