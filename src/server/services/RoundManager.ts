@@ -28,7 +28,7 @@ export class RoundManager implements OnStart {
 	private variant: Option<string> = Option.none();
 	private variantNames: string[] = [];
 	private lobby: Model = Workspace.Lobby;
-	private variantModel: Option<Model> = Option.none();
+	private alternativeModel: Option<Model> = Option.none();
 	private variants = ServerScriptService.Maps.lobby_variants;
 
 	private automatedRound: Option<Promise<Player[]>> = Option.none();
@@ -128,7 +128,7 @@ export class RoundManager implements OnStart {
 	private StopGamemode() {
 		store.clearSurvivors();
 		this.winCondition = Option.none();
-		this.SetDefaultVariant();
+		this.SetLobby();
 
 		Events.transition.broadcast();
 		task.wait(1.5);
@@ -232,12 +232,24 @@ export class RoundManager implements OnStart {
 		Events.cancelPepperPrompt.broadcast();
 	}
 
-	private UpdateVariantModel() {
-		if (this.variantModel.isSome()) {
-			this.variantModel.unwrap().Destroy();
-			this.variantModel = Option.none();
+	public loadAlternativeMap(map: Model) {
+		if (this.alternativeModel.isSome()) {
+			this.alternativeModel.unwrap().Destroy();
+			this.alternativeModel = Option.none();
 		}
 
+		const clone = map.Clone();
+		this.alternativeModel = Option.some(clone as Model);
+		clone.Parent = Workspace;
+		this.lobby.Parent = undefined;
+
+		this.logger.Info(
+			"loaded alternative map named {alternative}!!!!",
+			map.Name,
+		);
+	}
+
+	private UpdateVariantModel() {
 		if (this.variant.isNone()) {
 			this.logger.Info("load the lobby!!");
 
@@ -254,12 +266,7 @@ export class RoundManager implements OnStart {
 			return;
 		}
 
-		const clone = map.Clone();
-		this.variantModel = Option.some(clone as Model);
-		clone.Parent = Workspace;
-		this.lobby.Parent = undefined;
-
-		this.logger.Info("loaded variant {variant}!!!!", this.variant.unwrap());
+		this.loadAlternativeMap(map as Model);
 	}
 
 	public SetVariant(variant: string) {
@@ -280,7 +287,10 @@ export class RoundManager implements OnStart {
 		);
 	}
 
-	public SetDefaultVariant() {
+	// yeah... setting variant to none for the lobby is a side effect of replacing
+	// old code... i cant be bothered to make the architecture better though,
+	// so you're stuck with this lmao
+	public SetLobby() {
 		this.variant = Option.none();
 		this.UpdateVariantModel();
 	}
