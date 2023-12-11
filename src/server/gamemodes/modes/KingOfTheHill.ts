@@ -45,9 +45,9 @@ async function winCondition(): Promise<Player[]> {
 				character.PivotTo(
 					new CFrame(
 						new Vector3(
-							math.random(-50, 50),
+							math.random(-40, 40),
 							5,
-							math.random(-50, 50),
+							math.random(-40, 40),
 						),
 					),
 				);

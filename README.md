@@ -14,6 +14,8 @@ id consider my code hot garbage... so hopefully you can deal with that hahahahah
 
 have fun adding your own stuff ^-^
 
+oh ya, if ur making ur fork, keep in mind we use a [attribution sharealike creative commons license](https://creativecommons.org/licenses/by-sa/4.0/). the requirements shouldnt be too restricting, but if you have any problems feel free to contact me
+
 # tools
 ## disclaimer!!!
 dont get confused when I use react shit with @rbxts/roact its based off of [this](https://github.com/littensy/rbxts-react-example/) and apparently its to avoid conflicts w/ rbxts compiler

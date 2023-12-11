@@ -35,7 +35,8 @@ export function Display({ epoch }: DisplayProps) {
       Size={scale.map((alpha) =>
         UDim2.fromScale(0.15 + alpha, 0.15 + alpha),
       )}
-      Transparency={opacity}
+      BackgroundTransparency={1}
+      ImageTransparency={opacity}
     >
       <textlabel
         key="label"
