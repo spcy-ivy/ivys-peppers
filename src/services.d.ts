@@ -8,6 +8,7 @@ interface ServerScriptService {
 	};
 	Maps: Folder & {
 		lobby_variants: Folder;
+		KOTH: Folder;
 	};
 }
 

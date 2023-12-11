@@ -131,7 +131,7 @@ export class ZirconProvider implements OnInit {
 
 	private SetLobby = new ZirconFunctionBuilder("set_lobby").Bind(
 		(_context) => {
-			this.roundManager.SetDefaultVariant();
+			this.roundManager.SetLobby();
 		},
 	);
 }
