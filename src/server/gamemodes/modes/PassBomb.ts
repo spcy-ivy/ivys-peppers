@@ -8,13 +8,13 @@ import { lobbyVariant } from "../helpers/lobbyVariant";
 import { Events } from "server/network";
 
 //const round_length = 120;
-const round_length = 30;
-const bomb_base = ServerScriptService.Models.bomb;
+const roundLength = 30;
+const bombBase = ServerScriptService.Models.bomb;
 
 async function winCondition(): Promise<Player[]> {
 	const [obliterator, endGame, endGamePromise] = initializeGamemode();
 
-	const bomb = bomb_base.Clone();
+	const bomb = bombBase.Clone();
 	const handle = bomb.Handle;
 	let assigned: Option<Player> = Option.none();
 
@@ -78,7 +78,7 @@ async function winCondition(): Promise<Player[]> {
 	});
 
 	obliterator.AddPromise(
-		Promise.delay(round_length).then(() => {
+		Promise.delay(roundLength).then(() => {
 			const survivors = store.getState(selectSurvivors);
 
 			if (assigned.isSome()) {
@@ -100,7 +100,7 @@ async function winCondition(): Promise<Player[]> {
 
 	lobbyVariant();
 	assign_bomb_to_random();
-	Events.startTimer.broadcast(round_length);
+	Events.startTimer.broadcast(roundLength);
 
 	return endGamePromise.tap(() => {
 		Events.stopTimer.broadcast();
