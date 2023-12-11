@@ -232,7 +232,7 @@ export class RoundManager implements OnStart {
 		Events.cancelPepperPrompt.broadcast();
 	}
 
-	public loadAlternativeMap(map: Model) {
+	public LoadAlternativeMap(map: Model) {
 		if (this.alternativeModel.isSome()) {
 			this.alternativeModel.unwrap().Destroy();
 			this.alternativeModel = Option.none();
@@ -247,13 +247,13 @@ export class RoundManager implements OnStart {
 			"loaded alternative map named {alternative}!!!!",
 			map.Name,
 		);
+
+		return clone;
 	}
 
 	private UpdateVariantModel() {
 		if (this.variant.isNone()) {
-			this.logger.Info("load the lobby!!");
-
-			this.lobby.Parent = Workspace;
+			this.logger.Error("there is no variant!");
 			return;
 		}
 
@@ -266,7 +266,7 @@ export class RoundManager implements OnStart {
 			return;
 		}
 
-		this.loadAlternativeMap(map as Model);
+		this.LoadAlternativeMap(map as Model);
 	}
 
 	public SetVariant(variant: string) {
@@ -287,11 +287,15 @@ export class RoundManager implements OnStart {
 		);
 	}
 
-	// yeah... setting variant to none for the lobby is a side effect of replacing
-	// old code... i cant be bothered to make the architecture better though,
-	// so you're stuck with this lmao
 	public SetLobby() {
 		this.variant = Option.none();
-		this.UpdateVariantModel();
+
+		if (this.alternativeModel.isSome()) {
+			this.alternativeModel.unwrap().Destroy();
+			this.alternativeModel = Option.none();
+		}
+
+		this.logger.Info("load the lobby!!");
+		this.lobby.Parent = Workspace;
 	}
 }

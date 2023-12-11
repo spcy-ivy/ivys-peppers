@@ -1,7 +1,8 @@
 {
   "ClassName": "Part",
   "Properties": {
-    "Size": [1.762, 0.571, 5.027]
+    "Size": [1.762, 0.571, 5.027],
+    "Massless": false
   },
 
   "Children":

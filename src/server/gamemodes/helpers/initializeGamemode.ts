@@ -38,12 +38,10 @@ export function initializeGamemode(): [
 
 	const retrieved = store.getState(selectSurvivors);
 
-	/*
 	if (retrieved.len() < 2) {
 		Log.Error("not enough players!");
 		endGame.Fire();
 	}
-  */
 
 	retrieved.iter().forEach((player) => {
 		const character = player.Character || player.CharacterAdded.Wait()[0];
