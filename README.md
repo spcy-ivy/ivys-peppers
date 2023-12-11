@@ -1,7 +1,23 @@
-# ivy's Peppers
-dont get confused when I use react shit with @rbxts/roact its based off of [this](https://github.com/littensy/rbxts-react-example/) and apparently its to avoid conflicts w/ rbxts compiler
+# ivy's peppers
+open source repository for our games "ivy's peppers"
+
+# modding
+this game is open source, so might as well do something with that!
+
+feel free to fork this game and add your own peppers, gamemodes, etc!
+
+i want this to be a project owned by everyone, and I think it would be fun as hell if everyone could put their own unique twist on this game
+
+the primary directories you really need to be concerned about when making custom shit are `src/server/peppers` and `src/server/gamemodes`
+
+id consider my code hot garbage... so hopefully you can deal with that hahahahahaha
+
+have fun adding your own stuff ^-^
 
 # tools
+## disclaimer!!!
+dont get confused when I use react shit with @rbxts/roact its based off of [this](https://github.com/littensy/rbxts-react-example/) and apparently its to avoid conflicts w/ rbxts compiler
+
 ## the game itself
 - [rbxts](https://roblox-ts.com/) is the transpiler for typescript to luau
 - [flamework](https://fireboltofdeath.dev/docs/flamework/) is the framework for rbxts. using their core and networking modules too
