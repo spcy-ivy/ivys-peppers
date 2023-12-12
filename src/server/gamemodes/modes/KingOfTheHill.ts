@@ -120,9 +120,14 @@ async function winCondition(): Promise<Player[]> {
 
 	return endGamePromise.tap(() => {
 		Events.stopTimer.broadcast();
-		Events.announce.broadcast(
-			`${bestExistingPlayer.Name} wins with ${bestTime}!!`,
-		);
+
+		if (bestTime === 0) {
+			Events.announce.broadcast("omg all of u are SO bad");
+		} else {
+			Events.announce.broadcast(
+				`${bestExistingPlayer.Name} wins with ${bestTime}!!`,
+			);
+		}
 	});
 }
 

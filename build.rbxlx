@@ -105968,7 +105968,7 @@ local winCondition = TS.async(function()
 		local _exp = promiseR6(model)
 		local _arg0 = function(character)
 			hammer:Clone().Parent = character
-			character:PivotTo(CFrame.new(Vector3.new(math.random(-50, 50), 5, math.random(-50, 50))))
+			character:PivotTo(CFrame.new(Vector3.new(math.random(-40, 40), 5, math.random(-40, 40))))
 		end
 		_exp:andThen(_arg0)
 	end)
@@ -106047,7 +106047,11 @@ local winCondition = TS.async(function()
 	endGame:Fire()
 	return endGamePromise:tap(function()
 		Events.stopTimer:broadcast()
-		Events.announce:broadcast(bestExistingPlayer.Name .. (" wins with " .. (tostring(bestTime) .. "!!")))
+		if bestTime == 0 then
+			Events.announce:broadcast("omg all of u are SO bad")
+		else
+			Events.announce:broadcast(bestExistingPlayer.Name .. (" wins with " .. (tostring(bestTime) .. "!!")))
+		end
 	end)
 end)
 return winCondition
@@ -107478,7 +107482,8 @@ local function Display(_param)
 		Size = scale:map(function(alpha)
 			return UDim2.fromScale(0.15 + alpha, 0.15 + alpha)
 		end),
-		Transparency = opacity,
+		BackgroundTransparency = 1,
+		ImageTransparency = opacity,
 	}, {
 		Roact.createElement("TextLabel", {
 			key = "label",
