@@ -47,7 +47,7 @@ async function winCondition(): Promise<Player[]> {
 		});
 
 	Events.startTimer.broadcast(roundLength);
-	const times: Record<string, number> = {};
+	const times: Map<string, number> = new Map();
 
 	for (let i = 0; i < roundLength; i++) {
 		const overlapping = Workspace.GetPartsInPart(timezone);
@@ -76,10 +76,11 @@ async function winCondition(): Promise<Player[]> {
 				return;
 			}
 
-			if (times[player.Name] !== undefined) {
-				times[player.Name]++;
+			if (times.has(player.Name)) {
+				// as number because we already checked if it was there
+				times.set(player.Name, (times.get(player.Name) as number) + 1);
 			} else {
-				times[player.Name] = 1;
+				times.set(player.Name, 1);
 			}
 		});
 
@@ -90,22 +91,20 @@ async function winCondition(): Promise<Player[]> {
 	let bestExistingPlayer: Player | undefined = undefined;
 	let bestTime = 0;
 
-	for (const [name, value] of pairs(times)) {
+	for (const [name, value] of times) {
 		if (value < bestTime) {
 			continue;
 		}
 
-		// contains method suddenly disappeared?? thats funny...
-		const filteredSurvivors = survivors.retain(
-			(player) => player.Name === name,
-		);
-		const player = filteredSurvivors.get(0);
-		if (player.isNone()) {
+		const foundPlayer = survivors
+			.iter()
+			.find((player) => player.Name === name);
+		if (foundPlayer.isNone()) {
 			continue;
 		}
 
 		bestTime = value;
-		bestExistingPlayer = player.unwrap();
+		bestExistingPlayer = foundPlayer.unwrap();
 	}
 
 	if (bestExistingPlayer !== undefined) {

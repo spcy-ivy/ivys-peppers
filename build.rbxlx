@@ -104822,10 +104822,16 @@ local winCondition = TS.async(function()
 				if player == nil then
 					return nil
 				end
-				if times[player.Name] ~= nil then
-					times[player.Name] += 1
+				local _name = player.Name
+				if times[_name] ~= nil then
+					-- as number because we already checked if it was there
+					local _exp = player.Name
+					local _name_1 = player.Name
+					local _arg1 = (times[_name_1]) + 1
+					times[_exp] = _arg1
 				else
-					times[player.Name] = 1
+					local _name_1 = player.Name
+					times[_name_1] = 1
 				end
 			end
 			for _k, _v in characters do
@@ -104837,20 +104843,18 @@ local winCondition = TS.async(function()
 	local survivors = store:getState(selectSurvivors)
 	local bestExistingPlayer = nil
 	local bestTime = 0
-	for name, value in pairs(times) do
+	for name, value in times do
 		if value < bestTime then
 			continue
 		end
-		-- contains method suddenly disappeared?? thats funny...
-		local filteredSurvivors = survivors:retain(function(player)
+		local foundPlayer = survivors:iter():find(function(player)
 			return player.Name == name
 		end)
-		local player = filteredSurvivors:get(0)
-		if player:isNone() then
+		if foundPlayer:isNone() then
 			continue
 		end
 		bestTime = value
-		bestExistingPlayer = player:unwrap()
+		bestExistingPlayer = foundPlayer:unwrap()
 	end
 	if bestExistingPlayer ~= nil then
 		endGame:Fire(bestExistingPlayer)
@@ -105852,7 +105856,7 @@ return {
             <token name="LeftSurface">0</token>
             <token name="LeftSurfaceInput">0</token>
             <bool name="Locked">false</bool>
-            <bool name="Massless">false</bool>
+            <bool name="Massless">true</bool>
             <token name="Material">272</token>
             <string name="MaterialVariantSerialized"></string>
             <Content name="MeshId">
@@ -105973,7 +105977,7 @@ return {
               <token name="LeftSurface">0</token>
               <token name="LeftSurfaceInput">0</token>
               <bool name="Locked">false</bool>
-              <bool name="Massless">false</bool>
+              <bool name="Massless">true</bool>
               <token name="Material">272</token>
               <string name="MaterialVariantSerialized"></string>
               <Content name="MeshId">
@@ -106121,7 +106125,7 @@ return {
               <token name="LeftSurface">0</token>
               <token name="LeftSurfaceInput">0</token>
               <bool name="Locked">false</bool>
-              <bool name="Massless">false</bool>
+              <bool name="Massless">true</bool>
               <token name="Material">272</token>
               <string name="MaterialVariantSerialized"></string>
               <BinaryString name="MeshData">
@@ -107741,7 +107745,7 @@ local function Transition()
 	useEventListener(Events.cancelTransition, function()
 		setVisible(false)
 		-- wait for fade out animation
-		task.wait(1)
+		task.wait(2)
 		setEnabled(false)
 	end)
 	local _attributes = {

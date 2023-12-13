@@ -120,7 +120,7 @@
 				<token name="LeftSurface">0</token>
 				<token name="LeftSurfaceInput">0</token>
 				<bool name="Locked">false</bool>
-				<bool name="Massless">false</bool>
+				<bool name="Massless">true</bool>
 				<token name="Material">272</token>
 				<string name="MaterialVariantSerialized"></string>
 				<Content name="MeshId"><url>rbxassetid://13632087654</url></Content>
@@ -236,7 +236,7 @@
 					<token name="LeftSurface">0</token>
 					<token name="LeftSurfaceInput">0</token>
 					<bool name="Locked">false</bool>
-					<bool name="Massless">false</bool>
+					<bool name="Massless">true</bool>
 					<token name="Material">272</token>
 					<string name="MaterialVariantSerialized"></string>
 					<Content name="MeshId"><url>rbxassetid://4962971349</url></Content>
@@ -376,7 +376,7 @@
 					<token name="LeftSurface">0</token>
 					<token name="LeftSurfaceInput">0</token>
 					<bool name="Locked">false</bool>
-					<bool name="Massless">false</bool>
+					<bool name="Massless">true</bool>
 					<token name="Material">272</token>
 					<string name="MaterialVariantSerialized"></string>
 					<BinaryString name="MeshData"></BinaryString>
