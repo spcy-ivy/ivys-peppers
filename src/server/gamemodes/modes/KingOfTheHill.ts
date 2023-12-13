@@ -8,7 +8,7 @@ import Log from "@rbxts/log";
 import { Events } from "server/network";
 
 const roundLength = 30;
-const hammer = ServerScriptService.Models.hammer;
+const hammer = ServerScriptService.Tools.hammer;
 const kothVariants = ServerScriptService.Maps.KOTH.GetChildren();
 
 async function winCondition(): Promise<Player[]> {
@@ -33,7 +33,7 @@ async function winCondition(): Promise<Player[]> {
 	}
 
 	const clone = alternativeMap(variantModel);
-	const timezone = clone.FindFirstChild("timezone");
+	const timezone = clone.FindFirstChild("timezone") as BasePart;
 
 	store
 		.getState(selectSurvivors)
@@ -42,15 +42,7 @@ async function winCondition(): Promise<Player[]> {
 			const model = player.Character || player.CharacterAdded.Wait()[0];
 			promiseR6(model).then((character) => {
 				hammer.Clone().Parent = character;
-				character.PivotTo(
-					new CFrame(
-						new Vector3(
-							math.random(-40, 40),
-							5,
-							math.random(-40, 40),
-						),
-					),
-				);
+				character.PivotTo(timezone.CFrame.add(Vector3.yAxis.mul(3)));
 			});
 		});
 
@@ -58,7 +50,7 @@ async function winCondition(): Promise<Player[]> {
 	const times: Record<string, number> = {};
 
 	for (let i = 0; i < roundLength; i++) {
-		const overlapping = Workspace.GetPartsInPart(timezone as BasePart);
+		const overlapping = Workspace.GetPartsInPart(timezone);
 		const characters: Model[] = [];
 
 		overlapping.forEach((part) => {
@@ -95,7 +87,7 @@ async function winCondition(): Promise<Player[]> {
 	}
 
 	const survivors = store.getState(selectSurvivors);
-	let bestExistingPlayer: Player;
+	let bestExistingPlayer: Player | undefined = undefined;
 	let bestTime = 0;
 
 	for (const [name, value] of pairs(times)) {
@@ -116,17 +108,19 @@ async function winCondition(): Promise<Player[]> {
 		bestExistingPlayer = player.unwrap();
 	}
 
-	endGame.Fire();
+	if (bestExistingPlayer !== undefined) {
+		endGame.Fire(bestExistingPlayer);
+	} else {
+		endGame.Fire();
+	}
 
 	return endGamePromise.tap(() => {
-		Events.stopTimer.broadcast();
-
-		if (bestTime === 0) {
-			Events.announce.broadcast("omg all of u are SO bad");
-		} else {
+		if (bestExistingPlayer !== undefined) {
 			Events.announce.broadcast(
 				`${bestExistingPlayer.Name} wins with ${bestTime}!!`,
 			);
+		} else {
+			Events.announce.broadcast("omg all of u are SO bad");
 		}
 	});
 }

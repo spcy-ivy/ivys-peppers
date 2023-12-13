@@ -106,7 +106,7 @@ export function Transition() {
   return (
     <TransitionContext.Provider value={{ visible: visible }}>
       {enabled && (
-        <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
+        <screengui key="transition" IgnoreGuiInset={true} ResetOnSpawn={false}>
           <Tiles key="tiles" />
         </screengui>
       )}

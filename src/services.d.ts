@@ -1,5 +1,5 @@
 interface ServerScriptService {
-	Models: Folder & {
+	Tools: Folder & {
 		bomb: Tool & {
 			Handle: MeshPart;
 		};

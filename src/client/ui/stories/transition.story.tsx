@@ -9,29 +9,29 @@ import { useEventListener } from "@rbxts/pretty-react-hooks";
 import { UserInputService } from "@rbxts/services";
 
 function TransitionStory() {
-	const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(true);
 
-	useEventListener(UserInputService.InputBegan, (input: InputObject) => {
-		if (input.UserInputType !== Enum.UserInputType.MouseButton1) {
-			return;
-		}
+  useEventListener(UserInputService.InputBegan, (input: InputObject) => {
+    if (input.UserInputType !== Enum.UserInputType.MouseButton1) {
+      return;
+    }
 
-		setVisible(!visible);
-	});
+    setVisible(!visible);
+  });
 
-	return (
-		<TransitionContext.Provider value={{ visible: visible }}>
-			<Tiles key="tiles" />
-		</TransitionContext.Provider>
-	);
+  return (
+    <TransitionContext.Provider value={{ visible: visible }}>
+      <Tiles key="tiles" />
+    </TransitionContext.Provider>
+  );
 }
 
 export = (target: Instance) => {
-	const root = createRoot(target);
+  const root = createRoot(target);
 
-	root.render(<TransitionStory />);
+  root.render(<TransitionStory />);
 
-	return () => {
-		root.unmount();
-	};
+  return () => {
+    root.unmount();
+  };
 };

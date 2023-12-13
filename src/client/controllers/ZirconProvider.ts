@@ -5,7 +5,7 @@ import { ZirconClient } from "@rbxts/zircon";
 export class ZirconProvider implements OnInit {
 	onInit() {
 		ZirconClient.Init({
-			Keys: [Enum.KeyCode.Backquote],
+			Keys: [Enum.KeyCode.F2],
 		});
 	}
 }

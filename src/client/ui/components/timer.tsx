@@ -13,9 +13,10 @@ import { Events } from "client/network";
 interface DisplayProps {
   // because its a cool name and I cant name stuff "time"
   epoch: number;
+  visible: boolean;
 }
 
-export function Display({ epoch }: DisplayProps) {
+export function Display({ epoch, visible }: DisplayProps) {
   const [scale, scaleMotion] = useMotion(0);
   const [compressed, setCompressed] = useState(true);
   const [opacity, opacityMotion] = useMotion(0);
@@ -26,6 +27,10 @@ export function Display({ epoch }: DisplayProps) {
     scaleMotion.spring(compressed ? -0.02 : 0, springs.responsive);
   }, [epoch])
 
+  useEffect(() => {
+    opacityMotion.spring(visible ? 0 : 1, springs.responsive)
+  }, [visible])
+
   return (
     <imagelabel
       key="timer"
@@ -33,7 +38,7 @@ export function Display({ epoch }: DisplayProps) {
       AnchorPoint={Vector2.one.mul(0.5)}
       Position={UDim2.fromScale(0.06, 0.9)}
       Size={scale.map((alpha) =>
-        UDim2.fromScale(0.15 + alpha, 0.15 + alpha),
+        UDim2.fromScale(0.2 + alpha, 0.2 + alpha),
       )}
       BackgroundTransparency={1}
       ImageTransparency={opacity}
@@ -48,8 +53,8 @@ export function Display({ epoch }: DisplayProps) {
           )
         }
         AnchorPoint={Vector2.one.mul(0.5)}
-        Position={UDim2.fromScale(0.5, 0.5)}
-        Size={UDim2.fromScale(0.7, 0.7)}
+        Position={UDim2.fromScale(0.45, 0.65)}
+        Size={UDim2.fromScale(0.4, 0.4)}
         TextScaled={true}
         BackgroundTransparency={1}
         Text={tostring(epoch)}
@@ -85,18 +90,23 @@ export function useCountdown(initialValue = 0) {
 
 export function Timer() {
   const countdown = useCountdown();
+  const [visible, setVisible] = useState(false);
 
   // value used because we have a lack of a better name lol
   useEventListener(Events.startTimer, (value: number) => {
+    setVisible(true);
     countdown.setTime(value);
     countdown.start();
   });
 
-  useEventListener(Events.stopTimer, () => countdown.stop());
+  useEventListener(Events.stopTimer, () => {
+    setVisible(false);
+    countdown.stop()
+  });
 
   return (
-    <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
-      <Display epoch={countdown.value} />
+    <screengui key="timer" IgnoreGuiInset={true} ResetOnSpawn={false}>
+      <Display epoch={countdown.value} visible={visible} />
     </screengui>
   );
 }

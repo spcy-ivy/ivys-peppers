@@ -1,5 +1,5 @@
 import { Service, OnInit } from "@flamework/core";
-import { Logger } from "@rbxts/log";
+import Log, { Logger } from "@rbxts/log";
 import {
 	ZirconConfigurationBuilder,
 	ZirconDefaultGroup,
@@ -9,8 +9,11 @@ import {
 import { RoundManager } from "./RoundManager";
 import { Events } from "server/network";
 import { store } from "server/store";
+import { ServerScriptService } from "@rbxts/services";
 
 // extremely ugly and unreadable code ahead... BEWARE!!
+
+const tools = ServerScriptService.Tools;
 
 @Service()
 export class ZirconProvider implements OnInit {
@@ -44,6 +47,7 @@ export class ZirconProvider implements OnInit {
 				.AddFunction(this.CancelAutomation, [ZirconDefaultGroup.Admin])
 				.AddFunction(this.SetVariant, [ZirconDefaultGroup.Admin])
 				.AddFunction(this.SetLobby, [ZirconDefaultGroup.Admin])
+				.AddFunction(this.GetTool, [ZirconDefaultGroup.Admin])
 				.Build(),
 		);
 	}
@@ -134,4 +138,17 @@ export class ZirconProvider implements OnInit {
 			this.roundManager.SetLobby();
 		},
 	);
+
+	private GetTool = new ZirconFunctionBuilder("get_tool")
+		.AddArgument("string")
+		.Bind((context, name) => {
+			const tool = tools.FindFirstChild(name);
+
+			if (tool === undefined) {
+				Log.Warn("tool named {name} does not exist!", name);
+				return;
+			}
+
+			tool.Parent = context.GetExecutor().Character;
+		});
 }

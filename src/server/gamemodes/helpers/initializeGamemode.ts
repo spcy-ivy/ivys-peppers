@@ -7,6 +7,7 @@ import { promiseR6 } from "@rbxts/promise-character";
 import { store } from "server/store";
 import { selectSurvivors } from "server/store/survivors";
 import Log from "@rbxts/log";
+import { Events } from "server/network";
 
 export function initializeGamemode(): [
 	Janitor<void>,
@@ -38,10 +39,12 @@ export function initializeGamemode(): [
 
 	const retrieved = store.getState(selectSurvivors);
 
+	/*
 	if (retrieved.len() < 2) {
 		Log.Error("not enough players!");
 		endGame.Fire();
 	}
+  */
 
 	retrieved.iter().forEach((player) => {
 		const character = player.Character || player.CharacterAdded.Wait()[0];
@@ -68,9 +71,15 @@ export function initializeGamemode(): [
 			const winners = endGame.Wait();
 			obliterator.Destroy();
 
+			Events.stopTimer.broadcast();
+			Events.transition.broadcast();
+
 			resolve(winners);
 		},
-	);
+	)
+		// ending transition
+		.tap(() => Promise.delay(1.5))
+		.tap(() => Events.cancelTransition.broadcast());
 
 	return [obliterator, endGame, endGamePromise];
 }

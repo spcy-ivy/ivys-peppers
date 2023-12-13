@@ -17,7 +17,7 @@ function DisplayStory() {
   })
 
   return (
-    <Display epoch={countdown.value} />
+    <Display epoch={countdown.value} visible={true} />
   )
 }
 

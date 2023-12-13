@@ -11,8 +11,8 @@
 			"TS": {
 				"$path": "out/server"
 			},
-			"Models": {
-		 		"$path": "assets/models"
+			"Tools": {
+		 		"$path": "assets/tools"
 			},
       "Maps": {
         "$path": "assets/maps"
