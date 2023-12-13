@@ -104573,9 +104573,1165 @@ return Symbol</string>
     </Item>
     <Item class="Folder" referent="878">
       <Properties>
-        <string name="Name">Models</string>
+        <string name="Name">TS</string>
       </Properties>
-      <Item class="Tool" referent="879">
+      <Item class="Folder" referent="879">
+        <Properties>
+          <string name="Name">components</string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="880">
+        <Properties>
+          <string name="Name">gamemodes</string>
+          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+-- import TestMode from "server/gamemodes/modes/TestMode";
+local PassBomb = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "PassBomb")
+local SwordFight = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "SwordFight")
+local KingOfTheHill = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "KingOfTheHill")
+local gamemodes = {
+	pass_bomb = PassBomb,
+	sword_fight = SwordFight,
+	king_of_the_hill = KingOfTheHill,
+}
+return {
+	gamemodes = gamemodes,
+}
+]]></string>
+        </Properties>
+        <Item class="Folder" referent="881">
+          <Properties>
+            <string name="Name">helpers</string>
+          </Properties>
+          <Item class="ModuleScript" referent="882">
+            <Properties>
+              <string name="Name">alternativeMap</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local Flamework = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Flamework
+local alternativeMap = function(map)
+	local roundManager = Flamework.resolveDependency("server/services/RoundManager@RoundManager")
+	return roundManager:LoadAlternativeMap(map)
+end
+return {
+	alternativeMap = alternativeMap,
+}
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="883">
+            <Properties>
+              <string name="Name">initializeGamemode</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+-- YEAH YEAH I KNOW ITS OVERABSTRACTION
+-- SHUT UP IT REMOVES BOILERPLATE :sob:
+local Players = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").Players
+local Signal = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "beacon", "out").Signal
+local Janitor = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "janitor", "src").Janitor
+local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
+local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
+local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
+local Log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out").default
+local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
+local function initializeGamemode()
+	local endGame = Signal.new()
+	local obliterator = Janitor.new()
+	obliterator:Add(endGame)
+	obliterator:Add(store:subscribe(function(state)
+		local survivors = state.survivorsSlice.survivors
+		if survivors:len() < 2 then
+			endGame:Fire(unpack(survivors:asPtr()))
+		end
+	end))
+	-- for some sick and twisted reason the selector WILL NOT work here
+	-- why??? IDK WHY
+	-- honestly please try to fix this lmao
+	--[[
+		
+		    obliterator.Add(
+		        store.subscribe(selectSurvivors, (survivors) => {
+		            if (survivors.len() < 2) endGame.Fire(...survivors.asPtr());
+		        }),
+		    );
+		  
+	]]
+	local retrieved = store:getState(selectSurvivors)
+	--[[
+		
+		    if (retrieved.len() < 2) {
+		        Log.Error("not enough players!");
+		        endGame.Fire();
+		    }
+		  
+	]]
+	retrieved:iter():forEach(function(player)
+		local character = player.Character or (player.CharacterAdded:Wait())
+		local _exp = promiseR6(character)
+		local _arg0 = function(model)
+			return model.Humanoid.Died:Once(function()
+				store.removeSurvivor(player)
+			end)
+		end
+		_exp:andThen(_arg0)
+	end)
+	obliterator:Add(Players.PlayerRemoving:Connect(function(player)
+		return store.removeSurvivor(player)
+	end))
+	local endGamePromise = TS.Promise.new(function(resolve, _reject, onCancel)
+		onCancel(function()
+			Log.Info("gamemode has been cancelled!")
+			obliterator:Destroy()
+		end)
+		local winners = { endGame:Wait() }
+		obliterator:Destroy()
+		Events.stopTimer:broadcast()
+		Events.transition:broadcast()
+		resolve(winners)
+	end):tap(function()
+		return TS.Promise.delay(1.5)
+	end):tap(function()
+		return Events.cancelTransition:broadcast()
+	end)
+	return { obliterator, endGame, endGamePromise }
+end
+return {
+	initializeGamemode = initializeGamemode,
+}
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="884">
+            <Properties>
+              <string name="Name">lobbyVariant</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local Flamework = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Flamework
+local lobbyVariant = function()
+	-- putting inside because apparently it gets the dependency before it initializes
+	local roundManager = Flamework.resolveDependency("server/services/RoundManager@RoundManager")
+	-- 50% chance
+	local random = math.random(1, 2)
+	print(random)
+	if random == 1 then
+		roundManager:SetRandomVariant()
+	end
+end
+return {
+	lobbyVariant = lobbyVariant,
+}
+]]></string>
+            </Properties>
+          </Item>
+        </Item>
+        <Item class="Folder" referent="885">
+          <Properties>
+            <string name="Name">modes</string>
+          </Properties>
+          <Item class="ModuleScript" referent="886">
+            <Properties>
+              <string name="Name">KingOfTheHill</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
+local Players = _services.Players
+local ServerScriptService = _services.ServerScriptService
+local Workspace = _services.Workspace
+local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
+local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
+local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
+local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
+local alternativeMap = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "alternativeMap").alternativeMap
+local Log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out").default
+local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
+local roundLength = 30
+local hammer = ServerScriptService.Tools.hammer
+local kothVariants = ServerScriptService.Maps.KOTH:GetChildren()
+local winCondition = TS.async(function()
+	local _binding = initializeGamemode()
+	local _obliterator = _binding[1]
+	local endGame = _binding[2]
+	local endGamePromise = _binding[3]
+	local variantModel = kothVariants[math.random(0, #kothVariants - 1) + 1]
+	local unclonedTimezone = variantModel:FindFirstChild("timezone")
+	if unclonedTimezone == nil then
+		Log.Error("koth variant {variant} does not have a *child* named 'timezone'", variantModel.Name)
+		endGame:Fire()
+	end
+	local _result = unclonedTimezone
+	if _result ~= nil then
+		_result = _result:IsA("BasePart")
+	end
+	if not _result then
+		Log.Error("timezone is not a basepart")
+		endGame:Fire()
+	end
+	local clone = alternativeMap(variantModel)
+	local timezone = clone:FindFirstChild("timezone")
+	store:getState(selectSurvivors):iter():forEach(function(player)
+		local model = player.Character or (player.CharacterAdded:Wait())
+		local _exp = promiseR6(model)
+		local _arg0 = function(character)
+			hammer:Clone().Parent = character
+			local _fn = character
+			local _cFrame = timezone.CFrame
+			local _arg0_1 = Vector3.yAxis * 3
+			_fn:PivotTo(_cFrame + _arg0_1)
+		end
+		_exp:andThen(_arg0)
+	end)
+	Events.startTimer:broadcast(roundLength)
+	local times = {}
+	do
+		local i = 0
+		local _shouldIncrement = false
+		while true do
+			if _shouldIncrement then
+				i += 1
+			else
+				_shouldIncrement = true
+			end
+			if not (i < roundLength) then
+				break
+			end
+			local overlapping = Workspace:GetPartsInPart(timezone)
+			local characters = {}
+			local _arg0 = function(part)
+				local _result_1 = part.Parent
+				if _result_1 ~= nil then
+					_result_1 = _result_1:IsA("Model")
+				end
+				if not _result_1 then
+					return nil
+				end
+				if not part.Parent:FindFirstChildWhichIsA("Humanoid") then
+					return nil
+				end
+				local _parent = part.Parent
+				if table.find(characters, _parent) ~= nil then
+					return nil
+				end
+				local _parent_1 = part.Parent
+				table.insert(characters, _parent_1)
+			end
+			for _k, _v in overlapping do
+				_arg0(_v, _k - 1, overlapping)
+			end
+			local _arg0_1 = function(character)
+				local player = Players:GetPlayerFromCharacter(character)
+				if player == nil then
+					return nil
+				end
+				if times[player.Name] ~= nil then
+					times[player.Name] += 1
+				else
+					times[player.Name] = 1
+				end
+			end
+			for _k, _v in characters do
+				_arg0_1(_v, _k - 1, characters)
+			end
+			task.wait(1)
+		end
+	end
+	local survivors = store:getState(selectSurvivors)
+	local bestExistingPlayer = nil
+	local bestTime = 0
+	for name, value in pairs(times) do
+		if value < bestTime then
+			continue
+		end
+		-- contains method suddenly disappeared?? thats funny...
+		local filteredSurvivors = survivors:retain(function(player)
+			return player.Name == name
+		end)
+		local player = filteredSurvivors:get(0)
+		if player:isNone() then
+			continue
+		end
+		bestTime = value
+		bestExistingPlayer = player:unwrap()
+	end
+	if bestExistingPlayer ~= nil then
+		endGame:Fire(bestExistingPlayer)
+	else
+		endGame:Fire()
+	end
+	return endGamePromise:tap(function()
+		if bestExistingPlayer ~= nil then
+			Events.announce:broadcast(bestExistingPlayer.Name .. (" wins with " .. (tostring(bestTime) .. "!!")))
+		else
+			Events.announce:broadcast("omg all of u are SO bad")
+		end
+	end)
+end)
+return winCondition
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="887">
+            <Properties>
+              <string name="Name">PassBomb</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
+local Players = _services.Players
+local ServerScriptService = _services.ServerScriptService
+local Workspace = _services.Workspace
+local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
+local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
+local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
+local Log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out").default
+local Option = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "rust-classes", "out").Option
+local lobbyVariant = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "lobbyVariant").lobbyVariant
+local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
+--const round_length = 120;
+local roundLength = 30
+local bombBase = ServerScriptService.Tools.bomb
+local winCondition = TS.async(function()
+	local _binding = initializeGamemode()
+	local obliterator = _binding[1]
+	local endGame = _binding[2]
+	local endGamePromise = _binding[3]
+	local bomb = bombBase:Clone()
+	local handle = bomb.Handle
+	local assigned = Option:none()
+	obliterator:Add(bomb)
+	local assign_bomb = function(player)
+		assigned = Option:some(player)
+		local character = player.Character or (player.CharacterAdded:Wait())
+		bomb.Parent = character
+	end
+	local assign_bomb_to_random = function()
+		local survivors = store:getState(selectSurvivors)
+		local random = survivors:get(math.random(0, survivors:len() - 1))
+		if random:isNone() then
+			Log.Error("lmao apparently we errored trying to select a player???")
+			endGame:Fire()
+			return nil
+		end
+		assign_bomb(random:unwrap())
+	end
+	-- yknow.. when the player holding the bomb leaves/dies
+	obliterator:Add(store:subscribe(selectSurvivors, function(survivors)
+		if assigned:isNone() then
+			return nil
+		end
+		local holding = assigned:unwrap()
+		local found = survivors:iter():any(function(player)
+			return player == holding
+		end)
+		if found then
+			assign_bomb_to_random()
+		end
+	end))
+	-- when the bomb gets destroyed for some reason (it can fall off of the void)
+	obliterator:Add(bomb.Destroying:Connect(function()
+		return endGame:Fire()
+	end))
+	-- not adding onto janitor since the instance is already in it (and destroying instance auto disconnects all of its events)
+	handle.Touched:Connect(function(touched)
+		if assigned:isNone() then
+			return nil
+		end
+		local holding = assigned:unwrap()
+		local _humanoid = touched.Parent
+		if _humanoid ~= nil then
+			_humanoid = _humanoid:FindFirstChildWhichIsA("Humanoid")
+		end
+		local humanoid = _humanoid
+		if not humanoid then
+			return nil
+		end
+		local model = humanoid.Parent
+		local player = Players:GetPlayerFromCharacter(model)
+		if not player then
+			return nil
+		end
+		if holding == player then
+			return nil
+		end
+		assigned = Option:some(player)
+		bomb.Parent = model
+		handle.CanTouch = false
+		task.wait(0.5)
+		handle.CanTouch = true
+	end)
+	local _fn = obliterator
+	local _exp = TS.Promise.delay(roundLength)
+	local _arg0 = function()
+		local survivors = store:getState(selectSurvivors)
+		if assigned:isSome() then
+			local explosion = Instance.new("Explosion")
+			explosion.Position = bomb.Handle.Position
+			explosion.Parent = Workspace
+			task.wait(1)
+			endGame:Fire(unpack(survivors:retain(function(current)
+				return current ~= assigned:unwrap()
+			end):asPtr()))
+		else
+			Log.Error("cant get person holding bomb so NOBODY wins!!!")
+			endGame:Fire()
+		end
+	end
+	_fn:AddPromise(_exp:andThen(_arg0))
+	lobbyVariant()
+	assign_bomb_to_random()
+	Events.startTimer:broadcast(roundLength)
+	return endGamePromise:tap(function()
+		Events.announce:broadcast(tostring(assigned:unwrap()) .. " has lost!")
+	end)
+end)
+return winCondition
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="888">
+            <Properties>
+              <string name="Name">SwordFight</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local ServerScriptService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").ServerScriptService
+local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
+local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
+local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
+local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
+local lobbyVariant = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "lobbyVariant").lobbyVariant
+local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
+local sword = ServerScriptService.Tools.sword
+local winCondition = TS.async(function()
+	local _binding = initializeGamemode()
+	local _obliterator = _binding[1]
+	local _endGame = _binding[2]
+	local endGamePromise = _binding[3]
+	lobbyVariant()
+	store:getState(selectSurvivors):iter():forEach(function(player)
+		local model = player.Character or (player.CharacterAdded:Wait())
+		local _exp = promiseR6(model)
+		local _arg0 = function(character)
+			local _exp_1 = sword:Clone()
+			_exp_1.Parent = character
+			return _exp_1.Parent
+		end
+		_exp:andThen(_arg0)
+	end)
+	return endGamePromise:tap(function(winners)
+		Events.announce:broadcast(tostring(winners[1]) .. " is the last standing!")
+	end)
+end)
+return winCondition
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="889">
+            <Properties>
+              <string name="Name">TestMode</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+-- this is the template for all of the gamemodes!
+-- yeah yeah stupid overabstraction at least I dont have to write a million lines of boilerplate
+local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
+local winCondition = TS.async(function()
+	local _binding = initializeGamemode()
+	local _obliterator = _binding[1]
+	local _endGame = _binding[2]
+	local endGamePromise = _binding[3]
+	return endGamePromise
+end)
+return winCondition
+]]></string>
+            </Properties>
+          </Item>
+        </Item>
+      </Item>
+      <Item class="ModuleScript" referent="890">
+        <Properties>
+          <string name="Name">network</string>
+          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local _network = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "network")
+local GlobalEvents = _network.GlobalEvents
+local GlobalFunctions = _network.GlobalFunctions
+local Events = GlobalEvents.server
+local Functions = GlobalFunctions.server
+return {
+	Events = Events,
+	Functions = Functions,
+}
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="891">
+        <Properties>
+          <string name="Name">peppers</string>
+          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local Tabasco = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "tabasco").Tabasco
+local BellPepper = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "bell_pepper").BellPepper
+local Jalapeno = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "jalapeno").Jalapeno
+local CarolinaReaper = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "carolina_reaper").CarolinaReaper
+local IceCream = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "ice_cream").IceCream
+local GhostPepper = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "ghost_pepper").GhostPepper
+local peppers = {
+	tabasco = Tabasco,
+	bell_pepper = BellPepper,
+	jalapeno = Jalapeno,
+	carolina_reaper = CarolinaReaper,
+	ice_cream = IceCream,
+	ghost_pepper = GhostPepper,
+}
+return {
+	peppers = peppers,
+}
+]]></string>
+        </Properties>
+        <Item class="ModuleScript" referent="892">
+          <Properties>
+            <string name="Name">bell_pepper</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local BellPepper = {
+	option = {
+		icon = "rbxgameasset://Images/bell_pepper",
+		name = "bell_pepper",
+		description = "half health n' speed, high jump!",
+	},
+	effect = function(rig)
+		local humanoid = rig.Humanoid
+		humanoid.MaxHealth = 50
+		humanoid.Health = humanoid.MaxHealth
+		humanoid.JumpPower = 100
+		humanoid.WalkSpeed = 8
+	end,
+}
+return {
+	BellPepper = BellPepper,
+}
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="893">
+          <Properties>
+            <string name="Name">carolina_reaper</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local CarolinaReaper = {
+	option = {
+		icon = "rbxgameasset://Images/carolina_reaper",
+		name = "carolina_reaper",
+		description = "fast but cant jump and 1 health lol",
+	},
+	effect = function(rig)
+		local humanoid = rig.Humanoid
+		humanoid.MaxHealth = 1
+		humanoid.Health = humanoid.MaxHealth
+		humanoid.JumpPower = 0
+		humanoid.WalkSpeed = 64
+	end,
+}
+return {
+	CarolinaReaper = CarolinaReaper,
+}
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="894">
+          <Properties>
+            <string name="Name">ghost_pepper</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local GhostPepper = {
+	option = {
+		icon = "rbxgameasset://Images/ghost_pepper",
+		name = "ghost_pepper",
+		description = "half jump funny float, also literal interpretation lol",
+	},
+	effect = function(rig)
+		local rootpart = rig.HumanoidRootPart
+		local linearVelocity = Instance.new("LinearVelocity")
+		linearVelocity.Attachment0 = rootpart.RootAttachment
+		linearVelocity.MaxForce = 2000
+		linearVelocity.VectorVelocity = Vector3.yAxis * 1000
+		linearVelocity.Parent = rootpart
+		rig.Humanoid.JumpPower = 20
+	end,
+}
+return {
+	GhostPepper = GhostPepper,
+}
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="895">
+          <Properties>
+            <string name="Name">ice_cream</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local IceCream = {
+	option = {
+		icon = "rbxgameasset://Images/ice_cream",
+		name = "ice_cream",
+		description = "health 1.25x but walk and jump 0.75x",
+	},
+	effect = function(rig)
+		local humanoid = rig.Humanoid
+		humanoid.MaxHealth = 125
+		humanoid.Health = humanoid.MaxHealth
+		-- actual number is like 37.5 but who cares
+		humanoid.JumpPower = 35
+		humanoid.WalkSpeed = 12
+	end,
+}
+return {
+	IceCream = IceCream,
+}
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="896">
+          <Properties>
+            <string name="Name">jalapeno</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local Jalapeno = {
+	option = {
+		icon = "rbxgameasset://Images/jalapeno",
+		name = "jalapeno",
+		description = "walk and jump 1.25x but health is 25",
+	},
+	effect = function(rig)
+		local humanoid = rig.Humanoid
+		humanoid.MaxHealth = 25
+		humanoid.Health = humanoid.MaxHealth
+		humanoid.JumpPower = 75
+		humanoid.WalkSpeed = 24
+	end,
+}
+return {
+	Jalapeno = Jalapeno,
+}
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="897">
+          <Properties>
+            <string name="Name">tabasco</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local Tabasco = {
+	option = {
+		icon = "rbxgameasset://Images/tabasco",
+		name = "tabasco",
+		description = "half health n' jump, high speed!",
+	},
+	effect = function(rig)
+		local humanoid = rig.Humanoid
+		humanoid.MaxHealth = 50
+		humanoid.Health = humanoid.MaxHealth
+		humanoid.JumpPower = 25
+		humanoid.WalkSpeed = 32
+	end,
+}
+return {
+	Tabasco = Tabasco,
+}
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Script" referent="898">
+        <Properties>
+          <string name="Name">runtime</string>
+          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local _core = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out")
+local Flamework = _core.Flamework
+local Modding = _core.Modding
+local _log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out")
+local Log = _log.default
+local Logger = _log.Logger
+local Zircon = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "zircon", "out").default
+Log.SetLogger(Logger:configure():WriteTo(Zircon.Log.Console()):Create())
+-- Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
+Modding.registerDependency(function(ctor)
+	return Log.ForContext(ctor)
+end, "@rbxts/log:out/Logger@Logger")
+Flamework._addPaths({ "ServerScriptService", "TS", "components" })
+Flamework._addPaths({ "ServerScriptService", "TS", "services" })
+Flamework._addPaths({ "ReplicatedStorage", "TS", "components" })
+Flamework.ignite()
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="Folder" referent="899">
+        <Properties>
+          <string name="Name">services</string>
+        </Properties>
+        <Item class="ModuleScript" referent="900">
+          <Properties>
+            <string name="Name">RoundManager</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local Reflect = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Reflect
+local Service = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Service
+local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
+local Players = _services.Players
+local Workspace = _services.Workspace
+local ServerScriptService = _services.ServerScriptService
+local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
+local Option = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "rust-classes", "out").Option
+local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
+local gamemodes = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes").gamemodes
+local peppers = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers").peppers
+local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
+-- i really want to split this up but cant because then itd be unnecessary abstraction
+-- "wahh wahhh each piece of code should only do one job wahh wahh" SHUT UP!!!!!
+-- I NEED THIS ALL IN ONE MODULE SO THAT NAVIGATION ISNT A PAIN!!!!! I DONT WANT TO JUMP BETWEEN ONE MILLION SCRIPTS JUST TO GET WHAT HAPPENS IN **ONE ROUND**
+-- USE BIG FILES LIKE A REAL MAN!!!! EVERYTHING IS CONNECTED!!!!
+--
+-- why is being a programmer so painful
+local RoundManager
+do
+	RoundManager = setmetatable({}, {
+		__tostring = function()
+			return "RoundManager"
+		end,
+	})
+	RoundManager.__index = RoundManager
+	function RoundManager.new(...)
+		local self = setmetatable({}, RoundManager)
+		return self:constructor(...) or self
+	end
+	function RoundManager:constructor(logger)
+		self.logger = logger
+		self.winCondition = Option:none()
+		self.pepperNames = {}
+		self.gamemodeNames = {}
+		self.canApplyPepper = false
+		self.pepperApplied = {}
+		self.variant = Option:none()
+		self.variantNames = {}
+		self.lobby = Workspace.Lobby
+		self.alternativeModel = Option:none()
+		self.variants = ServerScriptService.Maps.lobby_variants
+		self.automatedRound = Option:none()
+		self.automating = false
+		for key, _value in pairs(peppers) do
+			table.insert(self.pepperNames, key)
+		end
+		for key, _value in pairs(gamemodes) do
+			table.insert(self.gamemodeNames, key)
+		end
+		local _exp = self.variants:GetChildren()
+		local _arg0 = function(map)
+			local _variantNames = self.variantNames
+			local _name = map.Name
+			table.insert(_variantNames, _name)
+			return #_variantNames
+		end
+		for _k, _v in _exp do
+			_arg0(_v, _k - 1, _exp)
+		end
+	end
+	function RoundManager:onStart()
+		Events.confirmPepper:connect(function(player, pepperName)
+			self.logger:Info("{player} attempted to apply {pepper}", player, pepperName)
+			if not self.canApplyPepper then
+				return nil
+			end
+			if not (peppers[pepperName] ~= nil) then
+				return nil
+			end
+			local _pepperApplied = self.pepperApplied
+			local _player = player
+			if table.find(_pepperApplied, _player) ~= nil then
+				return nil
+			end
+			local model = player.Character or (player.CharacterAdded:Wait())
+			local _exp = promiseR6(model)
+			local _arg0 = function(character)
+				peppers[pepperName].effect(character)
+				local _pepperApplied_1 = self.pepperApplied
+				local _player_1 = player
+				table.insert(_pepperApplied_1, _player_1)
+			end
+			_exp:andThen(_arg0)
+		end)
+		self:BeginAutomation()
+	end
+	function RoundManager:BeginAutomation()
+		self.logger:Info("starting round automation")
+		self.automating = true
+		while self.automating do
+			repeat
+				do
+					task.wait(5)
+				end
+			until not (#Players:GetPlayers() < 2)
+			local _exp = TS.Promise.new(function(resolve, _reject, onCancel)
+				onCancel(function()
+					self.canApplyPepper = false
+					Events.cancelPepperPrompt:broadcast()
+					self:CancelGamemode()
+				end)
+				store.setAllSurvivors()
+				self:PepperPrompt()
+				resolve(nil)
+			end):andThenCall(TS.Promise.delay, 5):andThenCall(function()
+				return Events.transition:broadcast()
+			end):andThenCall(TS.Promise.delay, 1.5):andThenCall(function()
+				return Events.cancelTransition:broadcast()
+			end):andThenCall(function()
+				return self:RandomGamemode()
+			end)
+			local _arg0 = function(survivors)
+				return TS.Promise.new(function(resolve)
+					return resolve(survivors)
+				end)
+			end
+			local round = _exp:andThen(_arg0):catch(function(reason)
+				self.logger:Warn("round errored with reason {reason}", reason)
+			end)
+			--   ^^^^^^^^^^^^^^^^^^^^
+			-- need a stupid `as` statement because APPPAARREENNTTTLYYY the fucking compiler wont stop fucking whining
+			-- TS compiler is so annoying sometimes
+			self.automatedRound = Option:some(round)
+			round:await()
+		end
+	end
+	function RoundManager:CancelAutomation()
+		self.logger:Info("cancelling automation")
+		self.automating = false
+		if self.automatedRound:isSome() then
+			self.automatedRound:unwrap():cancel()
+			self.automatedRound = Option:none()
+		end
+	end
+	function RoundManager:StopGamemode()
+		store.clearSurvivors()
+		self.winCondition = Option:none()
+		self:SetLobby()
+		local _exp = Players:GetPlayers()
+		local _arg0 = function(player)
+			if not player.Character then
+				return nil
+			end
+			player:LoadCharacter()
+		end
+		for _k, _v in _exp do
+			_arg0(_v, _k - 1, _exp)
+		end
+	end
+	function RoundManager:RunGamemode(gamemode)
+		if not (gamemodes[gamemode] ~= nil) then
+			self.logger:Error("input gamemode is not valid! use snake_case!")
+			return {}
+		end
+		if self.winCondition:isSome() then
+			self.logger:Error("a gamemode is already running!")
+			return {}
+		end
+		self.logger:Info("Testing started!")
+		local condition = gamemodes[gamemode]()
+		self.winCondition = Option:some(condition)
+		self.logger:Info("Currently running {gamemode} mode", gamemode)
+		Events.announce:broadcast("gamemode is " .. (gamemode .. "!"))
+		local winnersPromise = self.winCondition:unwrap()
+		winnersPromise:catch(function(err)
+			return self.logger:Error("Gamemode caught error: {error}", err)
+		end)
+		local winners = winnersPromise:expect()
+		self:StopGamemode()
+		self.logger:Info("Finished testing! The winners are {winners}", winners)
+		return if winners then winners else {}
+	end
+	function RoundManager:CancelGamemode()
+		if self.winCondition:isSome() then
+			local winnersPromise = self.winCondition:unwrap()
+			winnersPromise:cancel()
+			self:StopGamemode()
+			self.logger:Info("Ended gamemode and cleared survivors!")
+		end
+	end
+	function RoundManager:RandomGamemode()
+		local randomGamemode = function()
+			return self.gamemodeNames[math.random(0, #self.gamemodeNames - 1) + 1]
+		end
+		return self:RunGamemode(randomGamemode())
+	end
+	function RoundManager:ApplyPepper(player, pepper)
+		if not (peppers[pepper] ~= nil) then
+			self.logger:Error("input pepper is not valid! use snake_case!")
+			return nil
+		end
+		local definition = peppers[pepper]
+		local model = player.Character or (player.CharacterAdded:Wait())
+		self.logger:Info("Applying pepper effect")
+		local _exp = promiseR6(model)
+		local _arg0 = function(character)
+			definition.effect(character)
+		end
+		_exp:andThen(_arg0)
+	end
+	function RoundManager:PepperPrompt()
+		table.clear(self.pepperApplied)
+		-- oh my god lord forgive me for this heresy
+		-- APPARENTLY when it compiles it adds 1 so I have to negate the random params :(
+		local randomPepper = function()
+			return peppers[self.pepperNames[math.random(0, #self.pepperNames - 1) + 1]]
+		end
+		self.canApplyPepper = true
+		-- this hurts me more than it hurts you
+		Events.pepperPrompt:broadcast({ randomPepper().option, randomPepper().option, randomPepper().option })
+		task.wait(5)
+		self.canApplyPepper = false
+		Events.cancelPepperPrompt:broadcast()
+	end
+	function RoundManager:LoadAlternativeMap(map)
+		if self.alternativeModel:isSome() then
+			self.alternativeModel:unwrap():Destroy()
+			self.alternativeModel = Option:none()
+		end
+		local clone = map:Clone()
+		self.alternativeModel = Option:some(clone)
+		clone.Parent = Workspace
+		self.lobby.Parent = nil
+		self.logger:Info("loaded alternative map named {alternative}!!!!", map.Name)
+		return clone
+	end
+	function RoundManager:UpdateVariantModel()
+		if self.variant:isNone() then
+			self.logger:Error("there is no variant!")
+			return nil
+		end
+		local map = self.variants:FindFirstChild(self.variant:unwrap())
+		if not map then
+			self.logger:Warn("for some sick and twisted reason a registered variant wasnt in the folder, wont load, cursed variant was " .. self.variant:unwrap())
+			return nil
+		end
+		self:LoadAlternativeMap(map)
+	end
+	function RoundManager:SetVariant(variant)
+		local _variantNames = self.variantNames
+		local _variant = variant
+		if not (table.find(_variantNames, _variant) ~= nil) then
+			self.logger:Warn(variant .. " is not a lobby variant!")
+			return nil
+		end
+		self.variant = Option:some(variant)
+		self:UpdateVariantModel()
+	end
+	function RoundManager:SetRandomVariant()
+		-- why minus one??? I DONT KNOW!!! IT JUST WORKS!!! DONT TOUCH IT!!!!
+		-- also probably because .size() returns a value one larger than actual size
+		self:SetVariant(self.variantNames[math.random(0, #self.variantNames - 1) + 1])
+	end
+	function RoundManager:SetLobby()
+		self.variant = Option:none()
+		if self.alternativeModel:isSome() then
+			self.alternativeModel:unwrap():Destroy()
+			self.alternativeModel = Option:none()
+		end
+		self.logger:Info("load the lobby!!")
+		self.lobby.Parent = Workspace
+	end
+end
+--(Flamework) RoundManager metadata
+Reflect.defineMetadata(RoundManager, "identifier", "server/services/RoundManager@RoundManager")
+Reflect.defineMetadata(RoundManager, "flamework:parameters", { "@rbxts/log:out/Logger@Logger" })
+Reflect.defineMetadata(RoundManager, "flamework:implements", { "$:flamework@OnStart" })
+Reflect.decorate(RoundManager, "$:flamework@Service", Service, {})
+return {
+	RoundManager = RoundManager,
+}
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="901">
+          <Properties>
+            <string name="Name">ZirconProvider</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local Reflect = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Reflect
+local Service = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Service
+local Log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out").default
+local _zircon = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "zircon", "out")
+local ZirconConfigurationBuilder = _zircon.ZirconConfigurationBuilder
+local ZirconFunctionBuilder = _zircon.ZirconFunctionBuilder
+local ZirconServer = _zircon.ZirconServer
+local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
+local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
+local ServerScriptService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").ServerScriptService
+-- extremely ugly and unreadable code ahead... BEWARE!!
+local tools = ServerScriptService.Tools
+local ZirconProvider
+do
+	ZirconProvider = setmetatable({}, {
+		__tostring = function()
+			return "ZirconProvider"
+		end,
+	})
+	ZirconProvider.__index = ZirconProvider
+	function ZirconProvider.new(...)
+		local self = setmetatable({}, ZirconProvider)
+		return self:constructor(...) or self
+	end
+	function ZirconProvider:constructor(logger, roundManager)
+		self.logger = logger
+		self.roundManager = roundManager
+		self.TestGamemode = ZirconFunctionBuilder.new("test_gamemode"):AddArgument("string"):Bind(function(_context, mode)
+			self.roundManager:RunGamemode(mode)
+		end)
+		self.CancelGamemode = ZirconFunctionBuilder.new("cancel_gamemode"):Bind(function(_context)
+			return self.roundManager:CancelGamemode()
+		end)
+		self.RandomGamemode = ZirconFunctionBuilder.new("random_gamemode"):Bind(function(_context)
+			self.roundManager:RandomGamemode()
+		end)
+		self.Announce = ZirconFunctionBuilder.new("announce"):AddArgument("string"):Bind(function(_context, message)
+			return Events.announce:broadcast(message)
+		end)
+		self.TestPepper = ZirconFunctionBuilder.new("test_pepper"):AddArgument("string"):Bind(function(context, pepper)
+			return self.roundManager:ApplyPepper(context:GetExecutor(), pepper)
+		end)
+		self.PepperPrompt = ZirconFunctionBuilder.new("pepper_prompt"):Bind(function(_context)
+			return self.roundManager:PepperPrompt()
+		end)
+		self.AddSurvivor = ZirconFunctionBuilder.new("add_survivor"):AddArgument("player"):Bind(function(_context, player)
+			store.addSurvivor(player)
+		end)
+		self.RemoveSurvivor = ZirconFunctionBuilder.new("remove_survivor"):AddArgument("player"):Bind(function(_context, player)
+			store.removeSurvivor(player)
+		end)
+		self.ClearSurvivors = ZirconFunctionBuilder.new("clear_survivors"):Bind(function(_context)
+			store.clearSurvivors()
+		end)
+		self.ListSurvivors = ZirconFunctionBuilder.new("list_survivors"):Bind(function(_context)
+			self.logger:Info("survivors: {survivors}", store:getState().survivorsSlice.survivors:asPtr())
+		end)
+		self.SetAllSurvivors = ZirconFunctionBuilder.new("set_all_survivors"):Bind(function(_context)
+			store.setAllSurvivors()
+		end)
+		self.BeginAutomation = ZirconFunctionBuilder.new("begin_automation"):Bind(function(_context)
+			self.roundManager:BeginAutomation()
+		end)
+		self.CancelAutomation = ZirconFunctionBuilder.new("cancel_automation"):Bind(function(_context)
+			self.roundManager:CancelAutomation()
+		end)
+		self.SetVariant = ZirconFunctionBuilder.new("set_variant"):AddArgument("string"):Bind(function(_context, variant)
+			self.roundManager:SetVariant(variant)
+		end)
+		self.SetLobby = ZirconFunctionBuilder.new("set_lobby"):Bind(function(_context)
+			self.roundManager:SetLobby()
+		end)
+		self.GetTool = ZirconFunctionBuilder.new("get_tool"):AddArgument("string"):Bind(function(context, name)
+			local tool = tools:FindFirstChild(name)
+			if tool == nil then
+				Log.Warn("tool named {name} does not exist!", name)
+				return nil
+			end
+			tool.Parent = context:GetExecutor().Character
+		end)
+	end
+	function ZirconProvider:onInit()
+		ZirconServer.Registry.Init(ZirconConfigurationBuilder:default():CreateGroup(254, "admin", function(group)
+			return group:BindToUserIds({ 5199512481, 543918313, 3814464357 })
+		end):AddFunction(self.TestGamemode, { "admin" }):AddFunction(self.CancelGamemode, { "admin" }):AddFunction(self.RandomGamemode, { "admin" }):AddFunction(self.Announce, { "admin" }):AddFunction(self.TestPepper, { "admin" }):AddFunction(self.PepperPrompt, { "admin" }):AddFunction(self.AddSurvivor, { "admin" }):AddFunction(self.RemoveSurvivor, { "admin" }):AddFunction(self.ClearSurvivors, { "admin" }):AddFunction(self.ListSurvivors, { "admin" }):AddFunction(self.SetAllSurvivors, { "admin" }):AddFunction(self.BeginAutomation, { "admin" }):AddFunction(self.CancelAutomation, { "admin" }):AddFunction(self.SetVariant, { "admin" }):AddFunction(self.SetLobby, { "admin" }):AddFunction(self.GetTool, { "admin" }):Build())
+	end
+end
+--(Flamework) ZirconProvider metadata
+Reflect.defineMetadata(ZirconProvider, "identifier", "server/services/ZirconProvider@ZirconProvider")
+Reflect.defineMetadata(ZirconProvider, "flamework:parameters", { "@rbxts/log:out/Logger@Logger", "server/services/RoundManager@RoundManager" })
+Reflect.defineMetadata(ZirconProvider, "flamework:implements", { "$:flamework@OnInit" })
+Reflect.decorate(ZirconProvider, "$:flamework@Service", Service, {})
+return {
+	ZirconProvider = ZirconProvider,
+}
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="ModuleScript" referent="902">
+        <Properties>
+          <string name="Name">store</string>
+          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local combineProducers = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "reflex", "src").combineProducers
+local survivorsSlice = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").survivorsSlice
+local store = combineProducers({
+	survivorsSlice = survivorsSlice,
+})
+return {
+	store = store,
+}
+]]></string>
+        </Properties>
+        <Item class="ModuleScript" referent="903">
+          <Properties>
+            <string name="Name">survivors</string>
+            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local Players = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").Players
+local createProducer = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "reflex", "src").createProducer
+local Vec = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "rust-classes", "out").Vec
+local initialState = {
+	survivors = Vec:vec(),
+}
+local survivorsSlice = createProducer(initialState, {
+	addSurvivor = function(state, player)
+		local _object = {}
+		for _k, _v in state do
+			_object[_k] = _v
+		end
+		_object.survivors = state.survivors:push(player)
+		return _object
+	end,
+	removeSurvivor = function(state, player)
+		local _object = {}
+		for _k, _v in state do
+			_object[_k] = _v
+		end
+		_object.survivors = state.survivors:retain(function(current)
+			return current ~= player
+		end)
+		return _object
+	end,
+	setSurvivors = function(state, players)
+		local _object = {}
+		for _k, _v in state do
+			_object[_k] = _v
+		end
+		_object.survivors = Vec:vec(unpack(players))
+		return _object
+	end,
+	setAllSurvivors = function(state)
+		local _object = {}
+		for _k, _v in state do
+			_object[_k] = _v
+		end
+		_object.survivors = Vec:vec(unpack(Players:GetPlayers()))
+		return _object
+	end,
+	clearSurvivors = function(state)
+		local _object = {}
+		for _k, _v in state do
+			_object[_k] = _v
+		end
+		_object.survivors = Vec:vec()
+		return _object
+	end,
+})
+local selectSurvivors = function(state)
+	return state.survivorsSlice.survivors
+end
+return {
+	survivorsSlice = survivorsSlice,
+	selectSurvivors = selectSurvivors,
+}
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+    </Item>
+    <Item class="Folder" referent="904">
+      <Properties>
+        <string name="Name">Tools</string>
+      </Properties>
+      <Item class="Tool" referent="905">
         <Properties>
           <string name="Name">bomb</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -104633,7 +105789,7 @@ return Symbol</string>
           <OptionalCoordinateFrame name="WorldPivotData">
           </OptionalCoordinateFrame>
         </Properties>
-        <Item class="MeshPart" referent="880">
+        <Item class="MeshPart" referent="906">
           <Properties>
             <string name="Name">Handle</string>
             <SharedString name="AeroMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
@@ -104754,7 +105910,7 @@ return Symbol</string>
             </Vector3>
             <int name="VertexCount">42</int>
           </Properties>
-          <Item class="MeshPart" referent="881">
+          <Item class="MeshPart" referent="907">
             <Properties>
               <string name="Name">Top</string>
               <SharedString name="AeroMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
@@ -104875,7 +106031,7 @@ return Symbol</string>
               </Vector3>
               <int name="VertexCount">0</int>
             </Properties>
-            <Item class="WeldConstraint" referent="882">
+            <Item class="WeldConstraint" referent="908">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -104894,15 +106050,15 @@ return Symbol</string>
                   <R22>1</R22>
                 </CoordinateFrame>
                 <bool name="DefinesCapabilities">false</bool>
-                <Ref name="Part0Internal">881</Ref>
-                <Ref name="Part1Internal">880</Ref>
+                <Ref name="Part0Internal">907</Ref>
+                <Ref name="Part1Internal">906</Ref>
                 <int64 name="SourceAssetId">-1</int64>
                 <int name="State">3</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
           </Item>
-          <Item class="UnionOperation" referent="883">
+          <Item class="UnionOperation" referent="909">
             <Properties>
               <string name="Name">Stem</string>
               <SharedString name="AeroMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
@@ -105020,7 +106176,7 @@ return Symbol</string>
                 <Z>0</Z>
               </Vector3>
             </Properties>
-            <Item class="WeldConstraint" referent="884">
+            <Item class="WeldConstraint" referent="910">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105039,14 +106195,14 @@ return Symbol</string>
                   <R22>1</R22>
                 </CoordinateFrame>
                 <bool name="DefinesCapabilities">false</bool>
-                <Ref name="Part0Internal">883</Ref>
-                <Ref name="Part1Internal">881</Ref>
+                <Ref name="Part0Internal">909</Ref>
+                <Ref name="Part1Internal">907</Ref>
                 <int64 name="SourceAssetId">-1</int64>
                 <int name="State">3</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
-            <Item class="ParticleEmitter" referent="885">
+            <Item class="ParticleEmitter" referent="911">
               <Properties>
                 <string name="Name">ParticleEmitter</string>
                 <Vector3 name="Acceleration">
@@ -105098,7 +106254,7 @@ return Symbol</string>
               </Properties>
             </Item>
           </Item>
-          <Item class="Decal" referent="886">
+          <Item class="Decal" referent="912">
             <Properties>
               <string name="Name">Decal</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105121,7 +106277,7 @@ return Symbol</string>
           </Item>
         </Item>
       </Item>
-      <Item class="Tool" referent="887">
+      <Item class="Tool" referent="913">
         <Properties>
           <string name="Name">hammer</string>
           <bool name="CanBeDropped">false</bool>
@@ -105140,7 +106296,7 @@ return Symbol</string>
             <R22>-0.00000004371139</R22>
           </CoordinateFrame>
         </Properties>
-        <Item class="Part" referent="888">
+        <Item class="Part" referent="914">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Massless">false</bool>
@@ -105150,7 +106306,7 @@ return Symbol</string>
               <Z>5.027</Z>
             </Vector3>
           </Properties>
-          <Item class="SpecialMesh" referent="889">
+          <Item class="SpecialMesh" referent="915">
             <Properties>
               <string name="Name">Mesh</string>
               <Content name="MeshId">
@@ -105167,7 +106323,7 @@ return Symbol</string>
             </Properties>
           </Item>
         </Item>
-        <Item class="Script" referent="890">
+        <Item class="Script" referent="916">
           <Properties>
             <string name="Name">server</string>
             <string name="Source"><![CDATA[local debris = game:GetService("Debris")
@@ -105175,6 +106331,7 @@ local tool = script.Parent
 local handle = tool.Handle
 
 local DEBOUNCE_WAIT = 0.3
+local PUSH_FORCE = 100
 
 local function swingAnimation()
 	local Anim = Instance.new("StringValue")
@@ -105196,9 +106353,26 @@ local function whack()
 
 	handle.Touched:Connect(function(touched)
 		local humanoid = touched.Parent:FindFirstChildWhichIsA("Humanoid")
-		if humanoid then
-			humanoid.Sit = true
+
+		if not humanoid then
+			return
 		end
+
+		local rootpart = touched.Parent.HumanoidRootPart
+		local root_attachment = rootpart.RootAttachment
+
+		local velocity = Instance.new("LinearVelocity")
+
+		velocity.Attachment0 = root_attachment
+		velocity.MaxForce = 5000
+		velocity.VectorVelocity = handle.CFrame.LookVector * -PUSH_FORCE
+
+		velocity.Parent = rootpart
+
+		humanoid.Sit = true
+
+		task.wait(0.1)
+		velocity:Destroy()
 	end)
 
 	task.wait(DEBOUNCE_WAIT)
@@ -105211,7 +106385,7 @@ tool.Activated:Connect(whack)
           </Properties>
         </Item>
       </Item>
-      <Item class="Tool" referent="891">
+      <Item class="Tool" referent="917">
         <Properties>
           <string name="Name">sword</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105282,7 +106456,7 @@ tool.Activated:Connect(whack)
             </CFrame>
           </OptionalCoordinateFrame>
         </Properties>
-        <Item class="Part" referent="892">
+        <Item class="Part" referent="918">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -105378,7 +106552,7 @@ tool.Activated:Connect(whack)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="SpecialMesh" referent="893">
+          <Item class="SpecialMesh" referent="919">
             <Properties>
               <string name="Name">Mesh</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105409,7 +106583,7 @@ tool.Activated:Connect(whack)
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Sound" referent="894">
+          <Item class="Sound" referent="920">
             <Properties>
               <string name="Name">SwordSlash</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105434,7 +106608,7 @@ tool.Activated:Connect(whack)
               <float name="Volume">0.7</float>
             </Properties>
           </Item>
-          <Item class="Sound" referent="895">
+          <Item class="Sound" referent="921">
             <Properties>
               <string name="Name">SwordLunge</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105459,7 +106633,7 @@ tool.Activated:Connect(whack)
               <float name="Volume">0.6</float>
             </Properties>
           </Item>
-          <Item class="Sound" referent="896">
+          <Item class="Sound" referent="922">
             <Properties>
               <string name="Name">Unsheath</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105485,7 +106659,7 @@ tool.Activated:Connect(whack)
             </Properties>
           </Item>
         </Item>
-        <Item class="Script" referent="897">
+        <Item class="Script" referent="923">
           <Properties>
             <string name="Name">SwordScript</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105730,7 +106904,7 @@ Connection = Handle.Touched:Connect(Blow)</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="898">
+        <Item class="LocalScript" referent="924">
           <Properties>
             <string name="Name">MouseIcon</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -105773,1139 +106947,6 @@ Tool.Changed:Connect(OnChanged)
 ]]></string>
             <int64 name="SourceAssetId">-1</int64>
             <BinaryString name="Tags"></BinaryString>
-          </Properties>
-        </Item>
-      </Item>
-    </Item>
-    <Item class="Folder" referent="899">
-      <Properties>
-        <string name="Name">TS</string>
-      </Properties>
-      <Item class="Folder" referent="900">
-        <Properties>
-          <string name="Name">components</string>
-        </Properties>
-      </Item>
-      <Item class="ModuleScript" referent="901">
-        <Properties>
-          <string name="Name">gamemodes</string>
-          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
--- import TestMode from "server/gamemodes/modes/TestMode";
-local PassBomb = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "PassBomb")
-local SwordFight = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "SwordFight")
-local KingOfTheHill = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "KingOfTheHill")
-local gamemodes = {
-	pass_bomb = PassBomb,
-	sword_fight = SwordFight,
-	king_of_the_hill = KingOfTheHill,
-}
-return {
-	gamemodes = gamemodes,
-}
-]]></string>
-        </Properties>
-        <Item class="Folder" referent="902">
-          <Properties>
-            <string name="Name">helpers</string>
-          </Properties>
-          <Item class="ModuleScript" referent="903">
-            <Properties>
-              <string name="Name">alternativeMap</string>
-              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local Flamework = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Flamework
-local alternativeMap = function(map)
-	local roundManager = Flamework.resolveDependency("server/services/RoundManager@RoundManager")
-	return roundManager:LoadAlternativeMap(map)
-end
-return {
-	alternativeMap = alternativeMap,
-}
-]]></string>
-            </Properties>
-          </Item>
-          <Item class="ModuleScript" referent="904">
-            <Properties>
-              <string name="Name">initializeGamemode</string>
-              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
--- YEAH YEAH I KNOW ITS OVERABSTRACTION
--- SHUT UP IT REMOVES BOILERPLATE :sob:
-local Players = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").Players
-local Signal = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "beacon", "out").Signal
-local Janitor = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "janitor", "src").Janitor
-local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
-local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
-local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
-local Log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out").default
-local function initializeGamemode()
-	local endGame = Signal.new()
-	local obliterator = Janitor.new()
-	obliterator:Add(endGame)
-	obliterator:Add(store:subscribe(function(state)
-		local survivors = state.survivorsSlice.survivors
-		if survivors:len() < 2 then
-			endGame:Fire(unpack(survivors:asPtr()))
-		end
-	end))
-	-- for some sick and twisted reason the selector WILL NOT work here
-	-- why??? IDK WHY
-	-- honestly please try to fix this lmao
-	--[[
-		
-		    obliterator.Add(
-		        store.subscribe(selectSurvivors, (survivors) => {
-		            if (survivors.len() < 2) endGame.Fire(...survivors.asPtr());
-		        }),
-		    );
-		  
-	]]
-	local retrieved = store:getState(selectSurvivors)
-	if retrieved:len() < 2 then
-		Log.Error("not enough players!")
-		endGame:Fire()
-	end
-	retrieved:iter():forEach(function(player)
-		local character = player.Character or (player.CharacterAdded:Wait())
-		local _exp = promiseR6(character)
-		local _arg0 = function(model)
-			return model.Humanoid.Died:Once(function()
-				store.removeSurvivor(player)
-			end)
-		end
-		_exp:andThen(_arg0)
-	end)
-	obliterator:Add(Players.PlayerRemoving:Connect(function(player)
-		return store.removeSurvivor(player)
-	end))
-	local endGamePromise = TS.Promise.new(function(resolve, _reject, onCancel)
-		onCancel(function()
-			Log.Info("gamemode has been cancelled!")
-			obliterator:Destroy()
-		end)
-		local winners = { endGame:Wait() }
-		obliterator:Destroy()
-		resolve(winners)
-	end)
-	return { obliterator, endGame, endGamePromise }
-end
-return {
-	initializeGamemode = initializeGamemode,
-}
-]]></string>
-            </Properties>
-          </Item>
-          <Item class="ModuleScript" referent="905">
-            <Properties>
-              <string name="Name">lobbyVariant</string>
-              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local Flamework = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Flamework
-local lobbyVariant = function()
-	-- putting inside because apparently it gets the dependency before it initializes
-	local roundManager = Flamework.resolveDependency("server/services/RoundManager@RoundManager")
-	-- 50% chance
-	local random = math.random(1, 2)
-	print(random)
-	if random == 1 then
-		roundManager:SetRandomVariant()
-	end
-end
-return {
-	lobbyVariant = lobbyVariant,
-}
-]]></string>
-            </Properties>
-          </Item>
-        </Item>
-        <Item class="Folder" referent="906">
-          <Properties>
-            <string name="Name">modes</string>
-          </Properties>
-          <Item class="ModuleScript" referent="907">
-            <Properties>
-              <string name="Name">KingOfTheHill</string>
-              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
-local Players = _services.Players
-local ServerScriptService = _services.ServerScriptService
-local Workspace = _services.Workspace
-local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
-local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
-local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
-local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
-local alternativeMap = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "alternativeMap").alternativeMap
-local Log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out").default
-local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
-local roundLength = 30
-local hammer = ServerScriptService.Models.hammer
-local kothVariants = ServerScriptService.Maps.KOTH:GetChildren()
-local winCondition = TS.async(function()
-	local _binding = initializeGamemode()
-	local _obliterator = _binding[1]
-	local endGame = _binding[2]
-	local endGamePromise = _binding[3]
-	local variantModel = kothVariants[math.random(0, #kothVariants - 1) + 1]
-	local unclonedTimezone = variantModel:FindFirstChild("timezone")
-	if unclonedTimezone == nil then
-		Log.Error("koth variant {variant} does not have a *child* named 'timezone'", variantModel.Name)
-		endGame:Fire()
-	end
-	local _result = unclonedTimezone
-	if _result ~= nil then
-		_result = _result:IsA("BasePart")
-	end
-	if not _result then
-		Log.Error("timezone is not a basepart")
-		endGame:Fire()
-	end
-	local clone = alternativeMap(variantModel)
-	local timezone = clone:FindFirstChild("timezone")
-	store:getState(selectSurvivors):iter():forEach(function(player)
-		local model = player.Character or (player.CharacterAdded:Wait())
-		local _exp = promiseR6(model)
-		local _arg0 = function(character)
-			hammer:Clone().Parent = character
-			character:PivotTo(CFrame.new(Vector3.new(math.random(-40, 40), 5, math.random(-40, 40))))
-		end
-		_exp:andThen(_arg0)
-	end)
-	Events.startTimer:broadcast(roundLength)
-	local times = {}
-	do
-		local i = 0
-		local _shouldIncrement = false
-		while true do
-			if _shouldIncrement then
-				i += 1
-			else
-				_shouldIncrement = true
-			end
-			if not (i < roundLength) then
-				break
-			end
-			local overlapping = Workspace:GetPartsInPart(timezone)
-			local characters = {}
-			local _arg0 = function(part)
-				local _result_1 = part.Parent
-				if _result_1 ~= nil then
-					_result_1 = _result_1:IsA("Model")
-				end
-				if not _result_1 then
-					return nil
-				end
-				if not part.Parent:FindFirstChildWhichIsA("Humanoid") then
-					return nil
-				end
-				local _parent = part.Parent
-				if table.find(characters, _parent) ~= nil then
-					return nil
-				end
-				local _parent_1 = part.Parent
-				table.insert(characters, _parent_1)
-			end
-			for _k, _v in overlapping do
-				_arg0(_v, _k - 1, overlapping)
-			end
-			local _arg0_1 = function(character)
-				local player = Players:GetPlayerFromCharacter(character)
-				if player == nil then
-					return nil
-				end
-				if times[player.Name] ~= nil then
-					times[player.Name] += 1
-				else
-					times[player.Name] = 1
-				end
-			end
-			for _k, _v in characters do
-				_arg0_1(_v, _k - 1, characters)
-			end
-			task.wait(1)
-		end
-	end
-	local survivors = store:getState(selectSurvivors)
-	local bestExistingPlayer
-	local bestTime = 0
-	for name, value in pairs(times) do
-		if value < bestTime then
-			continue
-		end
-		-- contains method suddenly disappeared?? thats funny...
-		local filteredSurvivors = survivors:retain(function(player)
-			return player.Name == name
-		end)
-		local player = filteredSurvivors:get(0)
-		if player:isNone() then
-			continue
-		end
-		bestTime = value
-		bestExistingPlayer = player:unwrap()
-	end
-	endGame:Fire()
-	return endGamePromise:tap(function()
-		Events.stopTimer:broadcast()
-		if bestTime == 0 then
-			Events.announce:broadcast("omg all of u are SO bad")
-		else
-			Events.announce:broadcast(bestExistingPlayer.Name .. (" wins with " .. (tostring(bestTime) .. "!!")))
-		end
-	end)
-end)
-return winCondition
-]]></string>
-            </Properties>
-          </Item>
-          <Item class="ModuleScript" referent="908">
-            <Properties>
-              <string name="Name">PassBomb</string>
-              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
-local Players = _services.Players
-local ServerScriptService = _services.ServerScriptService
-local Workspace = _services.Workspace
-local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
-local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
-local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
-local Log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out").default
-local Option = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "rust-classes", "out").Option
-local lobbyVariant = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "lobbyVariant").lobbyVariant
-local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
---const round_length = 120;
-local roundLength = 30
-local bombBase = ServerScriptService.Models.bomb
-local winCondition = TS.async(function()
-	local _binding = initializeGamemode()
-	local obliterator = _binding[1]
-	local endGame = _binding[2]
-	local endGamePromise = _binding[3]
-	local bomb = bombBase:Clone()
-	local handle = bomb.Handle
-	local assigned = Option:none()
-	obliterator:Add(bomb)
-	local assign_bomb = function(player)
-		assigned = Option:some(player)
-		local character = player.Character or (player.CharacterAdded:Wait())
-		bomb.Parent = character
-	end
-	local assign_bomb_to_random = function()
-		local survivors = store:getState(selectSurvivors)
-		local random = survivors:get(math.random(0, survivors:len() - 1))
-		if random:isNone() then
-			Log.Error("lmao apparently we errored trying to select a player???")
-			endGame:Fire()
-			return nil
-		end
-		assign_bomb(random:unwrap())
-	end
-	-- yknow.. when the player holding the bomb leaves/dies
-	obliterator:Add(store:subscribe(selectSurvivors, function(survivors)
-		if assigned:isNone() then
-			return nil
-		end
-		local holding = assigned:unwrap()
-		local found = survivors:iter():any(function(player)
-			return player == holding
-		end)
-		if found then
-			assign_bomb_to_random()
-		end
-	end))
-	-- when the bomb gets destroyed for some reason (it can fall off of the void)
-	obliterator:Add(bomb.Destroying:Connect(function()
-		return endGame:Fire()
-	end))
-	-- not adding onto janitor since the instance is already in it (and destroying instance auto disconnects all of its events)
-	handle.Touched:Connect(function(touched)
-		if assigned:isNone() then
-			return nil
-		end
-		local holding = assigned:unwrap()
-		local _humanoid = touched.Parent
-		if _humanoid ~= nil then
-			_humanoid = _humanoid:FindFirstChildWhichIsA("Humanoid")
-		end
-		local humanoid = _humanoid
-		if not humanoid then
-			return nil
-		end
-		local model = humanoid.Parent
-		local player = Players:GetPlayerFromCharacter(model)
-		if not player then
-			return nil
-		end
-		if holding == player then
-			return nil
-		end
-		assigned = Option:some(player)
-		bomb.Parent = model
-		handle.CanTouch = false
-		task.wait(0.5)
-		handle.CanTouch = true
-	end)
-	local _fn = obliterator
-	local _exp = TS.Promise.delay(roundLength)
-	local _arg0 = function()
-		local survivors = store:getState(selectSurvivors)
-		if assigned:isSome() then
-			local explosion = Instance.new("Explosion")
-			explosion.Position = bomb.Handle.Position
-			explosion.Parent = Workspace
-			endGame:Fire(unpack(survivors:retain(function(current)
-				return current ~= assigned:unwrap()
-			end):asPtr()))
-		else
-			Log.Error("cant get person holding bomb so NOBODY wins!!!")
-			endGame:Fire()
-		end
-	end
-	_fn:AddPromise(_exp:andThen(_arg0))
-	lobbyVariant()
-	assign_bomb_to_random()
-	Events.startTimer:broadcast(roundLength)
-	return endGamePromise:tap(function()
-		Events.stopTimer:broadcast()
-		task.wait(1)
-		Events.announce:broadcast(tostring(assigned:unwrap()) .. " has lost!")
-	end)
-end)
-return winCondition
-]]></string>
-            </Properties>
-          </Item>
-          <Item class="ModuleScript" referent="909">
-            <Properties>
-              <string name="Name">SwordFight</string>
-              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local ServerScriptService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").ServerScriptService
-local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
-local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
-local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
-local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
-local lobbyVariant = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "lobbyVariant").lobbyVariant
-local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
-local sword = ServerScriptService.Models.sword
-local winCondition = TS.async(function()
-	local _binding = initializeGamemode()
-	local _obliterator = _binding[1]
-	local _endGame = _binding[2]
-	local endGamePromise = _binding[3]
-	lobbyVariant()
-	store:getState(selectSurvivors):iter():forEach(function(player)
-		local model = player.Character or (player.CharacterAdded:Wait())
-		local _exp = promiseR6(model)
-		local _arg0 = function(character)
-			local _exp_1 = sword:Clone()
-			_exp_1.Parent = character
-			return _exp_1.Parent
-		end
-		_exp:andThen(_arg0)
-	end)
-	return endGamePromise:tap(function(winners)
-		task.wait(1)
-		Events.announce:broadcast(tostring(winners[1]) .. " is the last standing!")
-	end)
-end)
-return winCondition
-]]></string>
-            </Properties>
-          </Item>
-          <Item class="ModuleScript" referent="910">
-            <Properties>
-              <string name="Name">TestMode</string>
-              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
--- this is the template for all of the gamemodes!
--- yeah yeah stupid overabstraction at least I dont have to write a million lines of boilerplate
-local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
-local winCondition = TS.async(function()
-	local _binding = initializeGamemode()
-	local _obliterator = _binding[1]
-	local _endGame = _binding[2]
-	local endGamePromise = _binding[3]
-	return endGamePromise
-end)
-return winCondition
-]]></string>
-            </Properties>
-          </Item>
-        </Item>
-      </Item>
-      <Item class="ModuleScript" referent="911">
-        <Properties>
-          <string name="Name">network</string>
-          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local _network = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "network")
-local GlobalEvents = _network.GlobalEvents
-local GlobalFunctions = _network.GlobalFunctions
-local Events = GlobalEvents.server
-local Functions = GlobalFunctions.server
-return {
-	Events = Events,
-	Functions = Functions,
-}
-]]></string>
-        </Properties>
-      </Item>
-      <Item class="ModuleScript" referent="912">
-        <Properties>
-          <string name="Name">peppers</string>
-          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local Tabasco = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "tabasco").Tabasco
-local BellPepper = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "bell_pepper").BellPepper
-local Jalapeno = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "jalapeno").Jalapeno
-local CarolinaReaper = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "carolina_reaper").CarolinaReaper
-local IceCream = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "ice_cream").IceCream
-local GhostPepper = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers", "ghost_pepper").GhostPepper
-local peppers = {
-	tabasco = Tabasco,
-	bell_pepper = BellPepper,
-	jalapeno = Jalapeno,
-	carolina_reaper = CarolinaReaper,
-	ice_cream = IceCream,
-	ghost_pepper = GhostPepper,
-}
-return {
-	peppers = peppers,
-}
-]]></string>
-        </Properties>
-        <Item class="ModuleScript" referent="913">
-          <Properties>
-            <string name="Name">bell_pepper</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local BellPepper = {
-	option = {
-		icon = "rbxgameasset://Images/bell_pepper",
-		name = "bell_pepper",
-		description = "half health n' speed, high jump!",
-	},
-	effect = function(rig)
-		local humanoid = rig.Humanoid
-		humanoid.MaxHealth = 50
-		humanoid.Health = humanoid.MaxHealth
-		humanoid.JumpPower = 100
-		humanoid.WalkSpeed = 8
-	end,
-}
-return {
-	BellPepper = BellPepper,
-}
-]]></string>
-          </Properties>
-        </Item>
-        <Item class="ModuleScript" referent="914">
-          <Properties>
-            <string name="Name">carolina_reaper</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local CarolinaReaper = {
-	option = {
-		icon = "rbxgameasset://Images/carolina_reaper",
-		name = "carolina_reaper",
-		description = "fast but cant jump and 1 health lol",
-	},
-	effect = function(rig)
-		local humanoid = rig.Humanoid
-		humanoid.MaxHealth = 1
-		humanoid.Health = humanoid.MaxHealth
-		humanoid.JumpPower = 0
-		humanoid.WalkSpeed = 64
-	end,
-}
-return {
-	CarolinaReaper = CarolinaReaper,
-}
-]]></string>
-          </Properties>
-        </Item>
-        <Item class="ModuleScript" referent="915">
-          <Properties>
-            <string name="Name">ghost_pepper</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local GhostPepper = {
-	option = {
-		icon = "rbxgameasset://Images/ghost_pepper",
-		name = "ghost_pepper",
-		description = "half jump funny float, also literal interpretation lol",
-	},
-	effect = function(rig)
-		local rootpart = rig.HumanoidRootPart
-		local linearVelocity = Instance.new("LinearVelocity")
-		linearVelocity.Attachment0 = rootpart.RootAttachment
-		linearVelocity.MaxForce = 2000
-		linearVelocity.VectorVelocity = Vector3.yAxis * 1000
-		linearVelocity.Parent = rootpart
-		rig.Humanoid.JumpPower = 20
-	end,
-}
-return {
-	GhostPepper = GhostPepper,
-}
-]]></string>
-          </Properties>
-        </Item>
-        <Item class="ModuleScript" referent="916">
-          <Properties>
-            <string name="Name">ice_cream</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local IceCream = {
-	option = {
-		icon = "rbxgameasset://Images/ice_cream",
-		name = "ice_cream",
-		description = "health 1.25x but walk and jump 0.75x",
-	},
-	effect = function(rig)
-		local humanoid = rig.Humanoid
-		humanoid.MaxHealth = 125
-		humanoid.Health = humanoid.MaxHealth
-		-- actual number is like 37.5 but who cares
-		humanoid.JumpPower = 35
-		humanoid.WalkSpeed = 12
-	end,
-}
-return {
-	IceCream = IceCream,
-}
-]]></string>
-          </Properties>
-        </Item>
-        <Item class="ModuleScript" referent="917">
-          <Properties>
-            <string name="Name">jalapeno</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local Jalapeno = {
-	option = {
-		icon = "rbxgameasset://Images/jalapeno",
-		name = "jalapeno",
-		description = "walk and jump 1.25x but health is 25",
-	},
-	effect = function(rig)
-		local humanoid = rig.Humanoid
-		humanoid.MaxHealth = 25
-		humanoid.Health = humanoid.MaxHealth
-		humanoid.JumpPower = 75
-		humanoid.WalkSpeed = 24
-	end,
-}
-return {
-	Jalapeno = Jalapeno,
-}
-]]></string>
-          </Properties>
-        </Item>
-        <Item class="ModuleScript" referent="918">
-          <Properties>
-            <string name="Name">tabasco</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local Tabasco = {
-	option = {
-		icon = "rbxgameasset://Images/tabasco",
-		name = "tabasco",
-		description = "half health n' jump, high speed!",
-	},
-	effect = function(rig)
-		local humanoid = rig.Humanoid
-		humanoid.MaxHealth = 50
-		humanoid.Health = humanoid.MaxHealth
-		humanoid.JumpPower = 25
-		humanoid.WalkSpeed = 32
-	end,
-}
-return {
-	Tabasco = Tabasco,
-}
-]]></string>
-          </Properties>
-        </Item>
-      </Item>
-      <Item class="Script" referent="919">
-        <Properties>
-          <string name="Name">runtime</string>
-          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local _core = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out")
-local Flamework = _core.Flamework
-local Modding = _core.Modding
-local _log = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "log", "out")
-local Log = _log.default
-local Logger = _log.Logger
-local Zircon = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "zircon", "out").default
-Log.SetLogger(Logger:configure():WriteTo(Zircon.Log.Console()):Create())
--- Log.SetLogger(Logger.configure().WriteTo(Log.RobloxOutput()).Create());
-Modding.registerDependency(function(ctor)
-	return Log.ForContext(ctor)
-end, "@rbxts/log:out/Logger@Logger")
-Flamework._addPaths({ "ServerScriptService", "TS", "components" })
-Flamework._addPaths({ "ServerScriptService", "TS", "services" })
-Flamework._addPaths({ "ReplicatedStorage", "TS", "components" })
-Flamework.ignite()
-]]></string>
-        </Properties>
-      </Item>
-      <Item class="Folder" referent="920">
-        <Properties>
-          <string name="Name">services</string>
-        </Properties>
-        <Item class="ModuleScript" referent="921">
-          <Properties>
-            <string name="Name">RoundManager</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local Reflect = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Reflect
-local Service = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Service
-local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
-local Players = _services.Players
-local Workspace = _services.Workspace
-local ServerScriptService = _services.ServerScriptService
-local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
-local Option = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "rust-classes", "out").Option
-local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
-local gamemodes = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes").gamemodes
-local peppers = TS.import(script, game:GetService("ServerScriptService"), "TS", "peppers").peppers
-local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
--- i really want to split this up but cant because then itd be unnecessary abstraction
--- "wahh wahhh each piece of code should only do one job wahh wahh" SHUT UP!!!!!
--- I NEED THIS ALL IN ONE MODULE SO THAT NAVIGATION ISNT A PAIN!!!!! I DONT WANT TO JUMP BETWEEN ONE MILLION SCRIPTS JUST TO GET WHAT HAPPENS IN **ONE ROUND**
--- USE BIG FILES LIKE A REAL MAN!!!! EVERYTHING IS CONNECTED!!!!
---
--- why is being a programmer so painful
-local RoundManager
-do
-	RoundManager = setmetatable({}, {
-		__tostring = function()
-			return "RoundManager"
-		end,
-	})
-	RoundManager.__index = RoundManager
-	function RoundManager.new(...)
-		local self = setmetatable({}, RoundManager)
-		return self:constructor(...) or self
-	end
-	function RoundManager:constructor(logger)
-		self.logger = logger
-		self.winCondition = Option:none()
-		self.pepperNames = {}
-		self.gamemodeNames = {}
-		self.canApplyPepper = false
-		self.pepperApplied = {}
-		self.variant = Option:none()
-		self.variantNames = {}
-		self.lobby = Workspace.Lobby
-		self.alternativeModel = Option:none()
-		self.variants = ServerScriptService.Maps.lobby_variants
-		self.automatedRound = Option:none()
-		self.automating = false
-		for key, _value in pairs(peppers) do
-			table.insert(self.pepperNames, key)
-		end
-		for key, _value in pairs(gamemodes) do
-			table.insert(self.gamemodeNames, key)
-		end
-		local _exp = self.variants:GetChildren()
-		local _arg0 = function(map)
-			local _variantNames = self.variantNames
-			local _name = map.Name
-			table.insert(_variantNames, _name)
-			return #_variantNames
-		end
-		for _k, _v in _exp do
-			_arg0(_v, _k - 1, _exp)
-		end
-	end
-	function RoundManager:onStart()
-		Events.confirmPepper:connect(function(player, pepperName)
-			self.logger:Info("{player} attempted to apply {pepper}", player, pepperName)
-			if not self.canApplyPepper then
-				return nil
-			end
-			if not (peppers[pepperName] ~= nil) then
-				return nil
-			end
-			local _pepperApplied = self.pepperApplied
-			local _player = player
-			if table.find(_pepperApplied, _player) ~= nil then
-				return nil
-			end
-			local model = player.Character or (player.CharacterAdded:Wait())
-			local _exp = promiseR6(model)
-			local _arg0 = function(character)
-				peppers[pepperName].effect(character)
-				local _pepperApplied_1 = self.pepperApplied
-				local _player_1 = player
-				table.insert(_pepperApplied_1, _player_1)
-			end
-			_exp:andThen(_arg0)
-		end)
-		self:BeginAutomation()
-	end
-	function RoundManager:BeginAutomation()
-		self.logger:Info("starting round automation")
-		self.automating = true
-		while self.automating do
-			repeat
-				do
-					task.wait(5)
-				end
-			until not (#Players:GetPlayers() < 2)
-			local _exp = TS.Promise.new(function(resolve, _reject, onCancel)
-				onCancel(function()
-					self.canApplyPepper = false
-					Events.cancelPepperPrompt:broadcast()
-					self:CancelGamemode()
-				end)
-				store.setAllSurvivors()
-				self:PepperPrompt()
-				resolve(nil)
-			end):andThenCall(TS.Promise.delay, 5):andThenCall(function()
-				return Events.transition:broadcast()
-			end):andThenCall(TS.Promise.delay, 1.5):andThenCall(function()
-				return Events.cancelTransition:broadcast()
-			end):andThenCall(function()
-				return self:RandomGamemode()
-			end)
-			local _arg0 = function(survivors)
-				return TS.Promise.new(function(resolve)
-					return resolve(survivors)
-				end)
-			end
-			local round = _exp:andThen(_arg0):catch(function(reason)
-				self.logger:Warn("round errored with reason {reason}", reason)
-			end)
-			--   ^^^^^^^^^^^^^^^^^^^^
-			-- need a stupid `as` statement because APPPAARREENNTTTLYYY the fucking compiler wont stop fucking whining
-			-- TS compiler is so annoying sometimes
-			self.automatedRound = Option:some(round)
-			round:await()
-		end
-	end
-	function RoundManager:CancelAutomation()
-		self.logger:Info("cancelling automation")
-		self.automating = false
-		if self.automatedRound:isSome() then
-			self.automatedRound:unwrap():cancel()
-			self.automatedRound = Option:none()
-		end
-	end
-	function RoundManager:StopGamemode()
-		store.clearSurvivors()
-		self.winCondition = Option:none()
-		self:SetLobby()
-		Events.transition:broadcast()
-		task.wait(1.5)
-		local _exp = Players:GetPlayers()
-		local _arg0 = function(player)
-			if not player.Character then
-				return nil
-			end
-			player:LoadCharacter()
-		end
-		for _k, _v in _exp do
-			_arg0(_v, _k - 1, _exp)
-		end
-		Events.cancelTransition:broadcast()
-	end
-	function RoundManager:RunGamemode(gamemode)
-		if not (gamemodes[gamemode] ~= nil) then
-			self.logger:Error("input gamemode is not valid! use snake_case!")
-			return {}
-		end
-		if self.winCondition:isSome() then
-			self.logger:Error("a gamemode is already running!")
-			return {}
-		end
-		self.logger:Info("Testing started!")
-		local condition = gamemodes[gamemode]()
-		self.winCondition = Option:some(condition)
-		self.logger:Info("Currently running {gamemode} mode", gamemode)
-		Events.announce:broadcast("gamemode is " .. (gamemode .. "!"))
-		local winnersPromise = self.winCondition:unwrap()
-		winnersPromise:catch(function(err)
-			return self.logger:Error("Gamemode caught error: {error}", err)
-		end)
-		local winners = winnersPromise:expect()
-		self:StopGamemode()
-		self.logger:Info("Finished testing! The winners are {winners}", winners)
-		return if winners then winners else {}
-	end
-	function RoundManager:CancelGamemode()
-		if self.winCondition:isSome() then
-			local winnersPromise = self.winCondition:unwrap()
-			winnersPromise:cancel()
-			self:StopGamemode()
-			self.logger:Info("Ended gamemode and cleared survivors!")
-		end
-	end
-	function RoundManager:RandomGamemode()
-		local randomGamemode = function()
-			return self.gamemodeNames[math.random(0, #self.gamemodeNames - 1) + 1]
-		end
-		return self:RunGamemode(randomGamemode())
-	end
-	function RoundManager:ApplyPepper(player, pepper)
-		if not (peppers[pepper] ~= nil) then
-			self.logger:Error("input pepper is not valid! use snake_case!")
-			return nil
-		end
-		local definition = peppers[pepper]
-		local model = player.Character or (player.CharacterAdded:Wait())
-		self.logger:Info("Applying pepper effect")
-		local _exp = promiseR6(model)
-		local _arg0 = function(character)
-			definition.effect(character)
-		end
-		_exp:andThen(_arg0)
-	end
-	function RoundManager:PepperPrompt()
-		table.clear(self.pepperApplied)
-		-- oh my god lord forgive me for this heresy
-		-- APPARENTLY when it compiles it adds 1 so I have to negate the random params :(
-		local randomPepper = function()
-			return peppers[self.pepperNames[math.random(0, #self.pepperNames - 1) + 1]]
-		end
-		self.canApplyPepper = true
-		-- this hurts me more than it hurts you
-		Events.pepperPrompt:broadcast({ randomPepper().option, randomPepper().option, randomPepper().option })
-		task.wait(5)
-		self.canApplyPepper = false
-		Events.cancelPepperPrompt:broadcast()
-	end
-	function RoundManager:LoadAlternativeMap(map)
-		if self.alternativeModel:isSome() then
-			self.alternativeModel:unwrap():Destroy()
-			self.alternativeModel = Option:none()
-		end
-		local clone = map:Clone()
-		self.alternativeModel = Option:some(clone)
-		clone.Parent = Workspace
-		self.lobby.Parent = nil
-		self.logger:Info("loaded alternative map named {alternative}!!!!", map.Name)
-		return clone
-	end
-	function RoundManager:UpdateVariantModel()
-		if self.variant:isNone() then
-			self.logger:Error("there is no variant!")
-			return nil
-		end
-		local map = self.variants:FindFirstChild(self.variant:unwrap())
-		if not map then
-			self.logger:Warn("for some sick and twisted reason a registered variant wasnt in the folder, wont load, cursed variant was " .. self.variant:unwrap())
-			return nil
-		end
-		self:LoadAlternativeMap(map)
-	end
-	function RoundManager:SetVariant(variant)
-		local _variantNames = self.variantNames
-		local _variant = variant
-		if not (table.find(_variantNames, _variant) ~= nil) then
-			self.logger:Warn(variant .. " is not a lobby variant!")
-			return nil
-		end
-		self.variant = Option:some(variant)
-		self:UpdateVariantModel()
-	end
-	function RoundManager:SetRandomVariant()
-		-- why minus one??? I DONT KNOW!!! IT JUST WORKS!!! DONT TOUCH IT!!!!
-		-- also probably because .size() returns a value one larger than actual size
-		self:SetVariant(self.variantNames[math.random(0, #self.variantNames - 1) + 1])
-	end
-	function RoundManager:SetLobby()
-		self.variant = Option:none()
-		if self.alternativeModel:isSome() then
-			self.alternativeModel:unwrap():Destroy()
-			self.alternativeModel = Option:none()
-		end
-		self.logger:Info("load the lobby!!")
-		self.lobby.Parent = Workspace
-	end
-end
---(Flamework) RoundManager metadata
-Reflect.defineMetadata(RoundManager, "identifier", "server/services/RoundManager@RoundManager")
-Reflect.defineMetadata(RoundManager, "flamework:parameters", { "@rbxts/log:out/Logger@Logger" })
-Reflect.defineMetadata(RoundManager, "flamework:implements", { "$:flamework@OnStart" })
-Reflect.decorate(RoundManager, "$:flamework@Service", Service, {})
-return {
-	RoundManager = RoundManager,
-}
-]]></string>
-          </Properties>
-        </Item>
-        <Item class="ModuleScript" referent="922">
-          <Properties>
-            <string name="Name">ZirconProvider</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local Reflect = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Reflect
-local Service = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Service
-local _zircon = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "zircon", "out")
-local ZirconConfigurationBuilder = _zircon.ZirconConfigurationBuilder
-local ZirconFunctionBuilder = _zircon.ZirconFunctionBuilder
-local ZirconServer = _zircon.ZirconServer
-local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
-local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
--- extremely ugly and unreadable code ahead... BEWARE!!
-local ZirconProvider
-do
-	ZirconProvider = setmetatable({}, {
-		__tostring = function()
-			return "ZirconProvider"
-		end,
-	})
-	ZirconProvider.__index = ZirconProvider
-	function ZirconProvider.new(...)
-		local self = setmetatable({}, ZirconProvider)
-		return self:constructor(...) or self
-	end
-	function ZirconProvider:constructor(logger, roundManager)
-		self.logger = logger
-		self.roundManager = roundManager
-		self.TestGamemode = ZirconFunctionBuilder.new("test_gamemode"):AddArgument("string"):Bind(function(_context, mode)
-			self.roundManager:RunGamemode(mode)
-		end)
-		self.CancelGamemode = ZirconFunctionBuilder.new("cancel_gamemode"):Bind(function(_context)
-			return self.roundManager:CancelGamemode()
-		end)
-		self.RandomGamemode = ZirconFunctionBuilder.new("random_gamemode"):Bind(function(_context)
-			self.roundManager:RandomGamemode()
-		end)
-		self.Announce = ZirconFunctionBuilder.new("announce"):AddArgument("string"):Bind(function(_context, message)
-			return Events.announce:broadcast(message)
-		end)
-		self.TestPepper = ZirconFunctionBuilder.new("test_pepper"):AddArgument("string"):Bind(function(context, pepper)
-			return self.roundManager:ApplyPepper(context:GetExecutor(), pepper)
-		end)
-		self.PepperPrompt = ZirconFunctionBuilder.new("pepper_prompt"):Bind(function(_context)
-			return self.roundManager:PepperPrompt()
-		end)
-		self.AddSurvivor = ZirconFunctionBuilder.new("add_survivor"):AddArgument("player"):Bind(function(_context, player)
-			store.addSurvivor(player)
-		end)
-		self.RemoveSurvivor = ZirconFunctionBuilder.new("remove_survivor"):AddArgument("player"):Bind(function(_context, player)
-			store.removeSurvivor(player)
-		end)
-		self.ClearSurvivors = ZirconFunctionBuilder.new("clear_survivors"):Bind(function(_context)
-			store.clearSurvivors()
-		end)
-		self.ListSurvivors = ZirconFunctionBuilder.new("list_survivors"):Bind(function(_context)
-			self.logger:Info("survivors: {survivors}", store:getState().survivorsSlice.survivors:asPtr())
-		end)
-		self.SetAllSurvivors = ZirconFunctionBuilder.new("set_all_survivors"):Bind(function(_context)
-			store.setAllSurvivors()
-		end)
-		self.BeginAutomation = ZirconFunctionBuilder.new("begin_automation"):Bind(function(_context)
-			self.roundManager:BeginAutomation()
-		end)
-		self.CancelAutomation = ZirconFunctionBuilder.new("cancel_automation"):Bind(function(_context)
-			self.roundManager:CancelAutomation()
-		end)
-		self.SetVariant = ZirconFunctionBuilder.new("set_variant"):AddArgument("string"):Bind(function(_context, variant)
-			self.roundManager:SetVariant(variant)
-		end)
-		self.SetLobby = ZirconFunctionBuilder.new("set_lobby"):Bind(function(_context)
-			self.roundManager:SetLobby()
-		end)
-	end
-	function ZirconProvider:onInit()
-		ZirconServer.Registry.Init(ZirconConfigurationBuilder:default():CreateGroup(254, "admin", function(group)
-			return group:BindToUserIds({ 5199512481, 543918313, 3814464357 })
-		end):AddFunction(self.TestGamemode, { "admin" }):AddFunction(self.CancelGamemode, { "admin" }):AddFunction(self.RandomGamemode, { "admin" }):AddFunction(self.Announce, { "admin" }):AddFunction(self.TestPepper, { "admin" }):AddFunction(self.PepperPrompt, { "admin" }):AddFunction(self.AddSurvivor, { "admin" }):AddFunction(self.RemoveSurvivor, { "admin" }):AddFunction(self.ClearSurvivors, { "admin" }):AddFunction(self.ListSurvivors, { "admin" }):AddFunction(self.SetAllSurvivors, { "admin" }):AddFunction(self.BeginAutomation, { "admin" }):AddFunction(self.CancelAutomation, { "admin" }):AddFunction(self.SetVariant, { "admin" }):AddFunction(self.SetLobby, { "admin" }):Build())
-	end
-end
---(Flamework) ZirconProvider metadata
-Reflect.defineMetadata(ZirconProvider, "identifier", "server/services/ZirconProvider@ZirconProvider")
-Reflect.defineMetadata(ZirconProvider, "flamework:parameters", { "@rbxts/log:out/Logger@Logger", "server/services/RoundManager@RoundManager" })
-Reflect.defineMetadata(ZirconProvider, "flamework:implements", { "$:flamework@OnInit" })
-Reflect.decorate(ZirconProvider, "$:flamework@Service", Service, {})
-return {
-	ZirconProvider = ZirconProvider,
-}
-]]></string>
-          </Properties>
-        </Item>
-      </Item>
-      <Item class="ModuleScript" referent="923">
-        <Properties>
-          <string name="Name">store</string>
-          <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local combineProducers = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "reflex", "src").combineProducers
-local survivorsSlice = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").survivorsSlice
-local store = combineProducers({
-	survivorsSlice = survivorsSlice,
-})
-return {
-	store = store,
-}
-]]></string>
-        </Properties>
-        <Item class="ModuleScript" referent="924">
-          <Properties>
-            <string name="Name">survivors</string>
-            <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
-local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
-local Players = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").Players
-local createProducer = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "reflex", "src").createProducer
-local Vec = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "rust-classes", "out").Vec
-local initialState = {
-	survivors = Vec:vec(),
-}
-local survivorsSlice = createProducer(initialState, {
-	addSurvivor = function(state, player)
-		local _object = {}
-		for _k, _v in state do
-			_object[_k] = _v
-		end
-		_object.survivors = state.survivors:push(player)
-		return _object
-	end,
-	removeSurvivor = function(state, player)
-		local _object = {}
-		for _k, _v in state do
-			_object[_k] = _v
-		end
-		_object.survivors = state.survivors:retain(function(current)
-			return current ~= player
-		end)
-		return _object
-	end,
-	setSurvivors = function(state, players)
-		local _object = {}
-		for _k, _v in state do
-			_object[_k] = _v
-		end
-		_object.survivors = Vec:vec(unpack(players))
-		return _object
-	end,
-	setAllSurvivors = function(state)
-		local _object = {}
-		for _k, _v in state do
-			_object[_k] = _v
-		end
-		_object.survivors = Vec:vec(unpack(Players:GetPlayers()))
-		return _object
-	end,
-	clearSurvivors = function(state)
-		local _object = {}
-		for _k, _v in state do
-			_object[_k] = _v
-		end
-		_object.survivors = Vec:vec()
-		return _object
-	end,
-})
-local selectSurvivors = function(state)
-	return state.survivorsSlice.survivors
-end
-return {
-	survivorsSlice = survivorsSlice,
-	selectSurvivors = selectSurvivors,
-}
-]]></string>
           </Properties>
         </Item>
       </Item>
@@ -107015,7 +107056,7 @@ do
 	end
 	function ZirconProvider:onInit()
 		ZirconClient.Init({
-			Keys = { Enum.KeyCode.Backquote },
+			Keys = { Enum.KeyCode.F2 },
 		})
 	end
 end
@@ -107162,6 +107203,7 @@ local function Announcements()
 		setPromise(_exp:andThen(_arg0))
 	end)
 	return Roact.createElement("ScreenGui", {
+		key = "announcements",
 		IgnoreGuiInset = true,
 		ResetOnSpawn = false,
 	}, {
@@ -107236,6 +107278,7 @@ local function PepperPrompt()
 	local _children = {}
 	local _length = #_children
 	local _child = visible and (Roact.createElement("ScreenGui", {
+		key = "cards",
 		IgnoreGuiInset = true,
 		ResetOnSpawn = false,
 	}, {
@@ -107466,6 +107509,7 @@ local springs = TS.import(script, script.Parent.Parent, "utils", "springs").spri
 local Events = TS.import(script, script.Parent.Parent.Parent, "network").Events
 local function Display(_param)
 	local epoch = _param.epoch
+	local visible = _param.visible
 	local scale, scaleMotion = useMotion(0)
 	local compressed, setCompressed = useState(true)
 	local opacity, opacityMotion = useMotion(0)
@@ -107474,13 +107518,16 @@ local function Display(_param)
 		setCompressed(epoch % 2 == 0)
 		scaleMotion:spring(if compressed then -0.02 else 0, springs.responsive)
 	end, { epoch })
+	useEffect(function()
+		opacityMotion:spring(if visible then 0 else 1, springs.responsive)
+	end, { visible })
 	return Roact.createElement("ImageLabel", {
 		key = "timer",
 		Image = "rbxgameasset://Images/fire",
 		AnchorPoint = Vector2.one * 0.5,
 		Position = UDim2.fromScale(0.06, 0.9),
 		Size = scale:map(function(alpha)
-			return UDim2.fromScale(0.15 + alpha, 0.15 + alpha)
+			return UDim2.fromScale(0.2 + alpha, 0.2 + alpha)
 		end),
 		BackgroundTransparency = 1,
 		ImageTransparency = opacity,
@@ -107489,8 +107536,8 @@ local function Display(_param)
 			key = "label",
 			FontFace = Font.new("rbxasset://fonts/families/FredokaOne.json", Enum.FontWeight.SemiBold, Enum.FontStyle.Italic),
 			AnchorPoint = Vector2.one * 0.5,
-			Position = UDim2.fromScale(0.5, 0.5),
-			Size = UDim2.fromScale(0.7, 0.7),
+			Position = UDim2.fromScale(0.45, 0.65),
+			Size = UDim2.fromScale(0.4, 0.4),
 			TextScaled = true,
 			BackgroundTransparency = 1,
 			Text = tostring(epoch),
@@ -107537,20 +107584,25 @@ local function useCountdown(initialValue)
 end
 local function Timer()
 	local countdown = useCountdown()
+	local visible, setVisible = useState(false)
 	-- value used because we have a lack of a better name lol
 	useEventListener(Events.startTimer, function(value)
+		setVisible(true)
 		countdown.setTime(value)
 		countdown.start()
 	end)
 	useEventListener(Events.stopTimer, function()
-		return countdown.stop()
+		setVisible(false)
+		countdown.stop()
 	end)
 	return Roact.createElement("ScreenGui", {
+		key = "timer",
 		IgnoreGuiInset = true,
 		ResetOnSpawn = false,
 	}, {
 		Roact.createElement(Display, {
 			epoch = countdown.value,
+			visible = visible,
 		}),
 	})
 end
@@ -107700,6 +107752,7 @@ local function Transition()
 	local _children = {}
 	local _length = #_children
 	local _child = enabled and (Roact.createElement("ScreenGui", {
+		key = "transition",
 		IgnoreGuiInset = true,
 		ResetOnSpawn = false,
 	}, {
@@ -107908,6 +107961,7 @@ local function DisplayStory()
 	end)
 	return Roact.createElement(Display, {
 		epoch = countdown.value,
+		visible = true,
 	})
 end
 return function(target)

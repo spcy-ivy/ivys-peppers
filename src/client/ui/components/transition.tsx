@@ -99,7 +99,7 @@ export function Transition() {
   useEventListener(Events.cancelTransition, () => {
     setVisible(false);
     // wait for fade out animation
-    task.wait(1);
+    task.wait(2);
     setEnabled(false);
   });
 
