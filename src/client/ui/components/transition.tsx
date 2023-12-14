@@ -99,14 +99,14 @@ export function Transition() {
   useEventListener(Events.cancelTransition, () => {
     setVisible(false);
     // wait for fade out animation
-    task.wait(1);
+    task.wait(2);
     setEnabled(false);
   });
 
   return (
     <TransitionContext.Provider value={{ visible: visible }}>
       {enabled && (
-        <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
+        <screengui key="transition" IgnoreGuiInset={true} ResetOnSpawn={false}>
           <Tiles key="tiles" />
         </screengui>
       )}

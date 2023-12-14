@@ -130,17 +130,13 @@ export class RoundManager implements OnStart {
 		this.winCondition = Option.none();
 		this.SetLobby();
 
-		Events.transition.broadcast();
-		task.wait(1.5);
-
 		Players.GetPlayers().forEach((player) => {
 			if (!player.Character) return;
 			player.LoadCharacter();
 		});
-
-		Events.cancelTransition.broadcast();
 	}
 
+	// what the fuck was I thinking with this string input?????
 	public RunGamemode(gamemode: string): Player[] {
 		if (!(gamemode in gamemodes)) {
 			this.logger.Error("input gamemode is not valid! use snake_case!");

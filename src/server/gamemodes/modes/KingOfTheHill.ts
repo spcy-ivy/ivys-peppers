@@ -8,7 +8,7 @@ import Log from "@rbxts/log";
 import { Events } from "server/network";
 
 const roundLength = 30;
-const hammer = ServerScriptService.Models.hammer;
+const hammer = ServerScriptService.Tools.hammer;
 const kothVariants = ServerScriptService.Maps.KOTH.GetChildren();
 
 async function winCondition(): Promise<Player[]> {
@@ -33,7 +33,7 @@ async function winCondition(): Promise<Player[]> {
 	}
 
 	const clone = alternativeMap(variantModel);
-	const timezone = clone.FindFirstChild("timezone");
+	const timezone = clone.FindFirstChild("timezone") as BasePart;
 
 	store
 		.getState(selectSurvivors)
@@ -42,23 +42,15 @@ async function winCondition(): Promise<Player[]> {
 			const model = player.Character || player.CharacterAdded.Wait()[0];
 			promiseR6(model).then((character) => {
 				hammer.Clone().Parent = character;
-				character.PivotTo(
-					new CFrame(
-						new Vector3(
-							math.random(-40, 40),
-							5,
-							math.random(-40, 40),
-						),
-					),
-				);
+				character.PivotTo(timezone.CFrame.add(Vector3.yAxis.mul(3)));
 			});
 		});
 
 	Events.startTimer.broadcast(roundLength);
-	const times: Record<string, number> = {};
+	const times: Map<string, number> = new Map();
 
 	for (let i = 0; i < roundLength; i++) {
-		const overlapping = Workspace.GetPartsInPart(timezone as BasePart);
+		const overlapping = Workspace.GetPartsInPart(timezone);
 		const characters: Model[] = [];
 
 		overlapping.forEach((part) => {
@@ -84,10 +76,11 @@ async function winCondition(): Promise<Player[]> {
 				return;
 			}
 
-			if (times[player.Name] !== undefined) {
-				times[player.Name]++;
+			if (times.has(player.Name)) {
+				// as number because we already checked if it was there
+				times.set(player.Name, (times.get(player.Name) as number) + 1);
 			} else {
-				times[player.Name] = 1;
+				times.set(player.Name, 1);
 			}
 		});
 
@@ -95,38 +88,38 @@ async function winCondition(): Promise<Player[]> {
 	}
 
 	const survivors = store.getState(selectSurvivors);
-	let bestExistingPlayer: Player;
+	let bestExistingPlayer: Player | undefined = undefined;
 	let bestTime = 0;
 
-	for (const [name, value] of pairs(times)) {
+	for (const [name, value] of times) {
 		if (value < bestTime) {
 			continue;
 		}
 
-		// contains method suddenly disappeared?? thats funny...
-		const filteredSurvivors = survivors.retain(
-			(player) => player.Name === name,
-		);
-		const player = filteredSurvivors.get(0);
-		if (player.isNone()) {
+		const foundPlayer = survivors
+			.iter()
+			.find((player) => player.Name === name);
+		if (foundPlayer.isNone()) {
 			continue;
 		}
 
 		bestTime = value;
-		bestExistingPlayer = player.unwrap();
+		bestExistingPlayer = foundPlayer.unwrap();
 	}
 
-	endGame.Fire();
+	if (bestExistingPlayer !== undefined) {
+		endGame.Fire(bestExistingPlayer);
+	} else {
+		endGame.Fire();
+	}
 
 	return endGamePromise.tap(() => {
-		Events.stopTimer.broadcast();
-
-		if (bestTime === 0) {
-			Events.announce.broadcast("omg all of u are SO bad");
-		} else {
+		if (bestExistingPlayer !== undefined) {
 			Events.announce.broadcast(
 				`${bestExistingPlayer.Name} wins with ${bestTime}!!`,
 			);
+		} else {
+			Events.announce.broadcast("omg all of u are SO bad");
 		}
 	});
 }

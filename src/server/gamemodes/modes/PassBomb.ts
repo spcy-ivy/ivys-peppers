@@ -9,7 +9,7 @@ import { Events } from "server/network";
 
 //const round_length = 120;
 const roundLength = 30;
-const bombBase = ServerScriptService.Models.bomb;
+const bombBase = ServerScriptService.Tools.bomb;
 
 async function winCondition(): Promise<Player[]> {
 	const [obliterator, endGame, endGamePromise] = initializeGamemode();
@@ -86,6 +86,8 @@ async function winCondition(): Promise<Player[]> {
 				explosion.Position = bomb.Handle.Position;
 				explosion.Parent = Workspace;
 
+				task.wait(1); // waits so that the players can see who won
+
 				endGame.Fire(
 					...survivors
 						.retain((current) => current !== assigned.unwrap())
@@ -103,8 +105,6 @@ async function winCondition(): Promise<Player[]> {
 	Events.startTimer.broadcast(roundLength);
 
 	return endGamePromise.tap(() => {
-		Events.stopTimer.broadcast();
-		task.wait(1); // waits so that the players can see who won
 		Events.announce.broadcast(`${assigned.unwrap()} has lost!`);
 	});
 }

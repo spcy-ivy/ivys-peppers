@@ -6,7 +6,7 @@ import { promiseR6 } from "@rbxts/promise-character";
 import { lobbyVariant } from "../helpers/lobbyVariant";
 import { Events } from "server/network";
 
-const sword = ServerScriptService.Models.sword;
+const sword = ServerScriptService.Tools.sword;
 
 async function winCondition(): Promise<Player[]> {
 	const [_obliterator, _endGame, endGamePromise] = initializeGamemode();
@@ -23,7 +23,6 @@ async function winCondition(): Promise<Player[]> {
 		});
 
 	return endGamePromise.tap((winners) => {
-		task.wait(1); // waits so that the players can see who won
 		Events.announce.broadcast(`${winners[0]} is the last standing!`);
 	});
 }

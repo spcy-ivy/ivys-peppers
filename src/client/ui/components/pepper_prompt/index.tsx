@@ -55,7 +55,7 @@ export function PepperPrompt() {
       }}
     >
       {visible && (
-        <screengui IgnoreGuiInset={true} ResetOnSpawn={false}>
+        <screengui key="cards" IgnoreGuiInset={true} ResetOnSpawn={false}>
           <Cards cards={cards} />
         </screengui>
       )}
