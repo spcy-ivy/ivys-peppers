@@ -4,11 +4,11 @@ import Roact, {
   useRef,
   useState,
 } from "@rbxts/roact";
-import colorscheme from "../utils/colorscheme";
 import { useMotion } from "../hooks/use-motion";
 import { useEventListener, useInterval } from "@rbxts/pretty-react-hooks";
 import { springs } from "../utils/springs";
 import { Events } from "client/network";
+import colorscheme from "shared/colorscheme";
 
 interface DisplayProps {
   // because its a cool name and I cant name stuff "time"

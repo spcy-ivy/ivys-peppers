@@ -3,7 +3,7 @@ import { store } from "server/store";
 import { initializeGamemode } from "../helpers/initializeGamemode";
 import { selectSurvivors } from "server/store/survivors";
 import { promiseR6 } from "@rbxts/promise-character";
-import { lobbyVariant } from "../helpers/lobbyVariant";
+import { randomLobbyVariant } from "../helpers/randomLobbyVariant";
 import { Events } from "server/network";
 
 const sword = ServerScriptService.Tools.sword;
@@ -11,7 +11,7 @@ const sword = ServerScriptService.Tools.sword;
 async function winCondition(): Promise<Player[]> {
 	const [_obliterator, _endGame, endGamePromise] = initializeGamemode();
 
-	lobbyVariant();
+	randomLobbyVariant();
 	store
 		.getState(selectSurvivors)
 		.iter()

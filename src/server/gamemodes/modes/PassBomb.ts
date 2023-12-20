@@ -4,10 +4,9 @@ import { store } from "server/store";
 import { selectSurvivors } from "server/store/survivors";
 import Log from "@rbxts/log";
 import { Option } from "@rbxts/rust-classes";
-import { lobbyVariant } from "../helpers/lobbyVariant";
+import { randomLobbyVariant } from "../helpers/randomLobbyVariant";
 import { Events } from "server/network";
 
-//const round_length = 120;
 const roundLength = 30;
 const bombBase = ServerScriptService.Tools.bomb;
 
@@ -100,7 +99,7 @@ async function winCondition(): Promise<Player[]> {
 		}),
 	);
 
-	lobbyVariant();
+	randomLobbyVariant();
 	assign_bomb_to_random();
 	Events.startTimer.broadcast(roundLength);
 
