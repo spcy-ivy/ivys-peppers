@@ -1,14 +1,7 @@
 import { Dependency } from "@flamework/core";
 import { RoundManager } from "server/services/RoundManager";
 
-export const lobbyVariant = () => {
-	// putting inside because apparently it gets the dependency before it initializes
+export const lobbyVariant = (variant: string) => {
 	const roundManager = Dependency<RoundManager>();
-
-	// 50% chance
-	const random = math.random(1, 2);
-	print(random);
-	if (random === 1) {
-		roundManager.SetRandomVariant();
-	}
+	roundManager.SetVariant(variant);
 };

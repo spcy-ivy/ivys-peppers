@@ -3,7 +3,7 @@ import { Events } from "client/network";
 import { isBinding, useEventListener } from "@rbxts/pretty-react-hooks";
 import { useMotion } from "../hooks/use-motion";
 import { springs } from "../utils/springs";
-import colorscheme from "../utils/colorscheme";
+import colorscheme from "shared/colorscheme";
 
 interface AnnouncementProps {
   text?: string | Binding<number>;
