@@ -104809,11 +104809,13 @@ local PassBomb = TS.import(script, game:GetService("ServerScriptService"), "TS",
 local SwordFight = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "SwordFight")
 local KingOfTheHill = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "KingOfTheHill")
 local Lasers = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "Lasers")
+local Killerbots = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "modes", "Killerbots")
 local gamemodes = {
 	pass_bomb = PassBomb,
 	sword_fight = SwordFight,
 	king_of_the_hill = KingOfTheHill,
 	lasers = Lasers,
+	killerbots = Killerbots,
 }
 return {
 	gamemodes = gamemodes,
@@ -104967,6 +104969,103 @@ return {
           </Properties>
           <Item class="ModuleScript" referent="891">
             <Properties>
+              <string name="Name">Killerbots</string>
+              <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
+local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
+local TweenService = _services.TweenService
+local Workspace = _services.Workspace
+local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
+local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "store").store
+local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
+local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
+local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
+local roundLength = 30
+local missileTravelLength = 1
+local createMissile = TS.async(function(player, killerbot)
+	local model = player.Character or (player.CharacterAdded:Wait())
+	local character = TS.await(promiseR6(model))
+	local rootpart = character.HumanoidRootPart
+	local missile = Instance.new("Part")
+	missile.CFrame = CFrame.lookAt(killerbot.Position, rootpart.Position)
+	missile.Size = Vector3.new(1, 1, 4)
+	missile.Anchored = true
+	missile.BrickColor = BrickColor.new(21)
+	missile.FrontSurface = Enum.SurfaceType.Studs
+	missile.BackSurface = Enum.SurfaceType.Studs
+	missile.TopSurface = Enum.SurfaceType.Studs
+	missile.BottomSurface = Enum.SurfaceType.Studs
+	missile.LeftSurface = Enum.SurfaceType.Studs
+	missile.RightSurface = Enum.SurfaceType.Studs
+	missile.Parent = Workspace
+	local tween = TweenService:Create(missile, TweenInfo.new(missileTravelLength, Enum.EasingStyle.Linear), {
+		Position = rootpart.Position,
+	})
+	tween:Play()
+	tween.Completed:Wait()
+	local explosion = Instance.new("Explosion")
+	explosion.Position = missile.Position
+	explosion.Parent = Workspace
+	missile:Destroy()
+end)
+local function createKillerbot()
+	local killerbot = Instance.new("Part")
+	killerbot.Shape = Enum.PartType.Ball
+	killerbot.Reflectance = 0.2
+	killerbot.Color = Color3.fromRGB(253, 234, 141)
+	killerbot.Size = Vector3.one * 4
+	killerbot.Anchored = true
+	killerbot.CanCollide = false
+	killerbot.Position = Vector3.new(math.random(-40, 40), 20, math.random(-40, 40))
+	killerbot.FrontSurface = Enum.SurfaceType.Weld
+	killerbot.BackSurface = Enum.SurfaceType.Weld
+	killerbot.TopSurface = Enum.SurfaceType.Weld
+	killerbot.BottomSurface = Enum.SurfaceType.Weld
+	killerbot.LeftSurface = Enum.SurfaceType.Weld
+	killerbot.RightSurface = Enum.SurfaceType.Weld
+	local loop = task.defer(function()
+		while true do
+			task.wait(2)
+			local tween = TweenService:Create(killerbot, TweenInfo.new(1), {
+				Position = Vector3.new(math.random(-40, 40), 20, math.random(-40, 40)),
+			})
+			tween:Play()
+			tween.Completed:Wait()
+			local survivors = store:getState(selectSurvivors)
+			local chosenPlayer = survivors:get(math.random(0, survivors:len()))
+			if chosenPlayer:isSome() then
+				createMissile(chosenPlayer:unwrap(), killerbot)
+			end
+		end
+	end)
+	killerbot.Parent = Workspace
+	return function()
+		task.cancel(loop)
+		killerbot:Destroy()
+	end
+end
+local winCondition = TS.async(function()
+	local _binding = initializeGamemode()
+	local obliterator = _binding[1]
+	local endGame = _binding[2]
+	local endGamePromise = _binding[3]
+	obliterator:AddPromise(TS.Promise.each({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, function()
+		return TS.Promise.delay(1):andThen(function()
+			obliterator:Add(createKillerbot())
+		end)
+	end))
+	obliterator:AddPromise(TS.Promise.delay(roundLength):andThen(function()
+		endGame:Fire(unpack(store:getState(selectSurvivors):asPtr()))
+	end))
+	Events.startTimer:broadcast(roundLength)
+	return endGamePromise
+end)
+return winCondition
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="892">
+            <Properties>
               <string name="Name">KingOfTheHill</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
@@ -105110,7 +105209,7 @@ return winCondition
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="892">
+          <Item class="ModuleScript" referent="893">
             <Properties>
               <string name="Name">Lasers</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105174,7 +105273,7 @@ return winCondition
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="893">
+          <Item class="ModuleScript" referent="894">
             <Properties>
               <string name="Name">PassBomb</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105290,7 +105389,7 @@ return winCondition
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="894">
+          <Item class="ModuleScript" referent="895">
             <Properties>
               <string name="Name">SwordFight</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105327,7 +105426,7 @@ return winCondition
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="895">
+          <Item class="ModuleScript" referent="896">
             <Properties>
               <string name="Name">TestMode</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105348,7 +105447,7 @@ return winCondition
           </Item>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="896">
+      <Item class="ModuleScript" referent="897">
         <Properties>
           <string name="Name">network</string>
           <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105365,7 +105464,7 @@ return {
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="897">
+      <Item class="ModuleScript" referent="898">
         <Properties>
           <string name="Name">peppers</string>
           <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105389,7 +105488,7 @@ return {
 }
 ]]></string>
         </Properties>
-        <Item class="ModuleScript" referent="898">
+        <Item class="ModuleScript" referent="899">
           <Properties>
             <string name="Name">bell_pepper</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105413,7 +105512,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="899">
+        <Item class="ModuleScript" referent="900">
           <Properties>
             <string name="Name">carolina_reaper</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105437,7 +105536,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="900">
+        <Item class="ModuleScript" referent="901">
           <Properties>
             <string name="Name">ghost_pepper</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105463,7 +105562,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="901">
+        <Item class="ModuleScript" referent="902">
           <Properties>
             <string name="Name">ice_cream</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105488,7 +105587,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="902">
+        <Item class="ModuleScript" referent="903">
           <Properties>
             <string name="Name">jalapeno</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105512,7 +105611,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="903">
+        <Item class="ModuleScript" referent="904">
           <Properties>
             <string name="Name">tabasco</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105537,7 +105636,7 @@ return {
           </Properties>
         </Item>
       </Item>
-      <Item class="Script" referent="904">
+      <Item class="Script" referent="905">
         <Properties>
           <string name="Name">runtime</string>
           <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105561,11 +105660,11 @@ Flamework.ignite()
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="905">
+      <Item class="Folder" referent="906">
         <Properties>
           <string name="Name">services</string>
         </Properties>
-        <Item class="ModuleScript" referent="906">
+        <Item class="ModuleScript" referent="907">
           <Properties>
             <string name="Name">RoundManager</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105845,7 +105944,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="907">
+        <Item class="ModuleScript" referent="908">
           <Properties>
             <string name="Name">ZirconProvider</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105949,7 +106048,7 @@ return {
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="908">
+      <Item class="ModuleScript" referent="909">
         <Properties>
           <string name="Name">store</string>
           <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -105964,7 +106063,7 @@ return {
 }
 ]]></string>
         </Properties>
-        <Item class="ModuleScript" referent="909">
+        <Item class="ModuleScript" referent="910">
           <Properties>
             <string name="Name">survivors</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -106031,11 +106130,11 @@ return {
         </Item>
       </Item>
     </Item>
-    <Item class="Folder" referent="910">
+    <Item class="Folder" referent="911">
       <Properties>
         <string name="Name">Tools</string>
       </Properties>
-      <Item class="Tool" referent="911">
+      <Item class="Tool" referent="912">
         <Properties>
           <string name="Name">bomb</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106093,7 +106192,7 @@ return {
           <OptionalCoordinateFrame name="WorldPivotData">
           </OptionalCoordinateFrame>
         </Properties>
-        <Item class="MeshPart" referent="912">
+        <Item class="MeshPart" referent="913">
           <Properties>
             <string name="Name">Handle</string>
             <SharedString name="AeroMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
@@ -106214,7 +106313,7 @@ return {
             </Vector3>
             <int name="VertexCount">42</int>
           </Properties>
-          <Item class="MeshPart" referent="913">
+          <Item class="MeshPart" referent="914">
             <Properties>
               <string name="Name">Top</string>
               <SharedString name="AeroMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
@@ -106335,7 +106434,7 @@ return {
               </Vector3>
               <int name="VertexCount">0</int>
             </Properties>
-            <Item class="WeldConstraint" referent="914">
+            <Item class="WeldConstraint" referent="915">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106354,15 +106453,15 @@ return {
                   <R22>1</R22>
                 </CoordinateFrame>
                 <bool name="DefinesCapabilities">false</bool>
-                <Ref name="Part0Internal">913</Ref>
-                <Ref name="Part1Internal">912</Ref>
+                <Ref name="Part0Internal">914</Ref>
+                <Ref name="Part1Internal">913</Ref>
                 <int64 name="SourceAssetId">-1</int64>
                 <int name="State">3</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
           </Item>
-          <Item class="UnionOperation" referent="915">
+          <Item class="UnionOperation" referent="916">
             <Properties>
               <string name="Name">Stem</string>
               <SharedString name="AeroMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
@@ -106480,7 +106579,7 @@ return {
                 <Z>0</Z>
               </Vector3>
             </Properties>
-            <Item class="WeldConstraint" referent="916">
+            <Item class="WeldConstraint" referent="917">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106499,14 +106598,14 @@ return {
                   <R22>1</R22>
                 </CoordinateFrame>
                 <bool name="DefinesCapabilities">false</bool>
-                <Ref name="Part0Internal">915</Ref>
-                <Ref name="Part1Internal">913</Ref>
+                <Ref name="Part0Internal">916</Ref>
+                <Ref name="Part1Internal">914</Ref>
                 <int64 name="SourceAssetId">-1</int64>
                 <int name="State">3</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
-            <Item class="ParticleEmitter" referent="917">
+            <Item class="ParticleEmitter" referent="918">
               <Properties>
                 <string name="Name">ParticleEmitter</string>
                 <Vector3 name="Acceleration">
@@ -106558,7 +106657,7 @@ return {
               </Properties>
             </Item>
           </Item>
-          <Item class="Decal" referent="918">
+          <Item class="Decal" referent="919">
             <Properties>
               <string name="Name">Decal</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106581,7 +106680,7 @@ return {
           </Item>
         </Item>
       </Item>
-      <Item class="Tool" referent="919">
+      <Item class="Tool" referent="920">
         <Properties>
           <string name="Name">hammer</string>
           <bool name="CanBeDropped">false</bool>
@@ -106600,7 +106699,7 @@ return {
             <R22>-0.00000004371139</R22>
           </CoordinateFrame>
         </Properties>
-        <Item class="Part" referent="920">
+        <Item class="Part" referent="921">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Massless">false</bool>
@@ -106610,7 +106709,7 @@ return {
               <Z>5.027</Z>
             </Vector3>
           </Properties>
-          <Item class="SpecialMesh" referent="921">
+          <Item class="SpecialMesh" referent="922">
             <Properties>
               <string name="Name">Mesh</string>
               <Content name="MeshId">
@@ -106627,7 +106726,7 @@ return {
             </Properties>
           </Item>
         </Item>
-        <Item class="Script" referent="922">
+        <Item class="Script" referent="923">
           <Properties>
             <string name="Name">server</string>
             <string name="Source"><![CDATA[local debris = game:GetService("Debris")
@@ -106689,7 +106788,7 @@ tool.Activated:Connect(whack)
           </Properties>
         </Item>
       </Item>
-      <Item class="Tool" referent="923">
+      <Item class="Tool" referent="924">
         <Properties>
           <string name="Name">sword</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106760,7 +106859,7 @@ tool.Activated:Connect(whack)
             </CFrame>
           </OptionalCoordinateFrame>
         </Properties>
-        <Item class="Part" referent="924">
+        <Item class="Part" referent="925">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -106856,7 +106955,7 @@ tool.Activated:Connect(whack)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="SpecialMesh" referent="925">
+          <Item class="SpecialMesh" referent="926">
             <Properties>
               <string name="Name">Mesh</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106887,7 +106986,7 @@ tool.Activated:Connect(whack)
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Sound" referent="926">
+          <Item class="Sound" referent="927">
             <Properties>
               <string name="Name">SwordSlash</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106912,7 +107011,7 @@ tool.Activated:Connect(whack)
               <float name="Volume">0.7</float>
             </Properties>
           </Item>
-          <Item class="Sound" referent="927">
+          <Item class="Sound" referent="928">
             <Properties>
               <string name="Name">SwordLunge</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106937,7 +107036,7 @@ tool.Activated:Connect(whack)
               <float name="Volume">0.6</float>
             </Properties>
           </Item>
-          <Item class="Sound" referent="928">
+          <Item class="Sound" referent="929">
             <Properties>
               <string name="Name">Unsheath</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -106963,7 +107062,7 @@ tool.Activated:Connect(whack)
             </Properties>
           </Item>
         </Item>
-        <Item class="Script" referent="929">
+        <Item class="Script" referent="930">
           <Properties>
             <string name="Name">SwordScript</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -107208,7 +107307,7 @@ Connection = Handle.Touched:Connect(Blow)</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="930">
+        <Item class="LocalScript" referent="931">
           <Properties>
             <string name="Name">MouseIcon</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -107256,34 +107355,34 @@ Tool.Changed:Connect(OnChanged)
       </Item>
     </Item>
   </Item>
-  <Item class="SoundService" referent="931">
+  <Item class="SoundService" referent="932">
     <Properties>
       <string name="Name">SoundService</string>
       <bool name="RespectFilteringEnabled">true</bool>
     </Properties>
   </Item>
-  <Item class="StarterPlayer" referent="932">
+  <Item class="StarterPlayer" referent="933">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="933">
+    <Item class="StarterPlayerScripts" referent="934">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="934">
+      <Item class="Folder" referent="935">
         <Properties>
           <string name="Name">TS</string>
         </Properties>
-        <Item class="Folder" referent="935">
+        <Item class="Folder" referent="936">
           <Properties>
             <string name="Name">components</string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="936">
+        <Item class="Folder" referent="937">
           <Properties>
             <string name="Name">controllers</string>
           </Properties>
-          <Item class="ModuleScript" referent="937">
+          <Item class="ModuleScript" referent="938">
             <Properties>
               <string name="Name">UI</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107336,7 +107435,7 @@ return {
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="938">
+          <Item class="ModuleScript" referent="939">
             <Properties>
               <string name="Name">ZirconProvider</string>
               <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107375,7 +107474,7 @@ return {
             </Properties>
           </Item>
         </Item>
-        <Item class="ModuleScript" referent="939">
+        <Item class="ModuleScript" referent="940">
           <Properties>
             <string name="Name">network</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107392,7 +107491,7 @@ return {
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="940">
+        <Item class="LocalScript" referent="941">
           <Properties>
             <string name="Name">runtime</string>
             <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107415,15 +107514,15 @@ Flamework.ignite()
 ]]></string>
           </Properties>
         </Item>
-        <Item class="Folder" referent="941">
+        <Item class="Folder" referent="942">
           <Properties>
             <string name="Name">ui</string>
           </Properties>
-          <Item class="Folder" referent="942">
+          <Item class="Folder" referent="943">
             <Properties>
               <string name="Name">components</string>
             </Properties>
-            <Item class="ModuleScript" referent="943">
+            <Item class="ModuleScript" referent="944">
               <Properties>
                 <string name="Name">announcements</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107524,7 +107623,7 @@ return {
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="944">
+            <Item class="ModuleScript" referent="945">
               <Properties>
                 <string name="Name">pepper_prompt</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107600,7 +107699,7 @@ return {
 }
 ]]></string>
               </Properties>
-              <Item class="ModuleScript" referent="945">
+              <Item class="ModuleScript" referent="946">
                 <Properties>
                   <string name="Name">cards</string>
                   <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107774,7 +107873,7 @@ return {
 ]]></string>
                 </Properties>
               </Item>
-              <Item class="ModuleScript" referent="946">
+              <Item class="ModuleScript" referent="947">
                 <Properties>
                   <string name="Name">promptContext</string>
                   <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107793,7 +107892,7 @@ return {
                 </Properties>
               </Item>
             </Item>
-            <Item class="ModuleScript" referent="947">
+            <Item class="ModuleScript" referent="948">
               <Properties>
                 <string name="Name">timer</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -107918,7 +108017,7 @@ return {
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="948">
+            <Item class="ModuleScript" referent="949">
               <Properties>
                 <string name="Name">transition</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108078,11 +108177,11 @@ return {
               </Properties>
             </Item>
           </Item>
-          <Item class="Folder" referent="949">
+          <Item class="Folder" referent="950">
             <Properties>
               <string name="Name">hooks</string>
             </Properties>
-            <Item class="ModuleScript" referent="950">
+            <Item class="ModuleScript" referent="951">
               <Properties>
                 <string name="Name">use-array</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108134,7 +108233,7 @@ return {
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="951">
+            <Item class="ModuleScript" referent="952">
               <Properties>
                 <string name="Name">use-motion</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108170,11 +108269,11 @@ return {
               </Properties>
             </Item>
           </Item>
-          <Item class="Folder" referent="952">
+          <Item class="Folder" referent="953">
             <Properties>
               <string name="Name">stories</string>
             </Properties>
-            <Item class="ModuleScript" referent="953">
+            <Item class="ModuleScript" referent="954">
               <Properties>
                 <string name="Name">announcements.story</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108211,7 +108310,7 @@ end
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="954">
+            <Item class="ModuleScript" referent="955">
               <Properties>
                 <string name="Name">cards.story</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108243,7 +108342,7 @@ end
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="955">
+            <Item class="ModuleScript" referent="956">
               <Properties>
                 <string name="Name">timer.story</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108278,7 +108377,7 @@ end
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="956">
+            <Item class="ModuleScript" referent="957">
               <Properties>
                 <string name="Name">transition.story</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108323,11 +108422,11 @@ end
               </Properties>
             </Item>
           </Item>
-          <Item class="Folder" referent="957">
+          <Item class="Folder" referent="958">
             <Properties>
               <string name="Name">utils</string>
             </Properties>
-            <Item class="ModuleScript" referent="958">
+            <Item class="ModuleScript" referent="959">
               <Properties>
                 <string name="Name">colorscheme</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108335,7 +108434,7 @@ return nil
 ]]></string>
               </Properties>
             </Item>
-            <Item class="ModuleScript" referent="959">
+            <Item class="ModuleScript" referent="960">
               <Properties>
                 <string name="Name">springs</string>
                 <string name="Source"><![CDATA[-- Compiled with roblox-ts v2.2.0
@@ -108367,12 +108466,12 @@ return {
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="960">
+  <Item class="Workspace" referent="961">
     <Properties>
       <string name="Name">Workspace</string>
       <bool name="FilteringEnabled">true</bool>
     </Properties>
-    <Item class="Model" referent="961">
+    <Item class="Model" referent="962">
       <Properties>
         <string name="Name">Borders</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -108421,7 +108520,7 @@ return {
           </CFrame>
         </OptionalCoordinateFrame>
       </Properties>
-      <Item class="Part" referent="962">
+      <Item class="Part" referent="963">
         <Properties>
           <string name="Name">border</string>
           <bool name="Anchored">true</bool>
@@ -108518,7 +108617,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="963">
+      <Item class="Part" referent="964">
         <Properties>
           <string name="Name">border</string>
           <bool name="Anchored">true</bool>
@@ -108615,7 +108714,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="964">
+      <Item class="Part" referent="965">
         <Properties>
           <string name="Name">border</string>
           <bool name="Anchored">true</bool>
@@ -108712,7 +108811,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="965">
+      <Item class="Part" referent="966">
         <Properties>
           <string name="Name">border</string>
           <bool name="Anchored">true</bool>
@@ -108809,7 +108908,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="966">
+      <Item class="Part" referent="967">
         <Properties>
           <string name="Name">border</string>
           <bool name="Anchored">true</bool>
@@ -108907,7 +109006,7 @@ return {
         </Properties>
       </Item>
     </Item>
-    <Item class="Model" referent="967">
+    <Item class="Model" referent="968">
       <Properties>
         <string name="Name">Lobby</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -108956,7 +109055,7 @@ return {
           </CFrame>
         </OptionalCoordinateFrame>
       </Properties>
-      <Item class="Part" referent="968">
+      <Item class="Part" referent="969">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109053,7 +109152,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="969">
+      <Item class="Part" referent="970">
         <Properties>
           <string name="Name">plate</string>
           <bool name="Anchored">true</bool>
@@ -109149,7 +109248,7 @@ return {
             <Z>0</Z>
           </Vector3>
         </Properties>
-        <Item class="Texture" referent="970">
+        <Item class="Texture" referent="971">
           <Properties>
             <string name="Name">Texture</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -109174,7 +109273,7 @@ return {
           </Properties>
         </Item>
       </Item>
-      <Item class="Part" referent="971">
+      <Item class="Part" referent="972">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109271,7 +109370,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="972">
+      <Item class="Part" referent="973">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109368,7 +109467,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="973">
+      <Item class="Part" referent="974">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109465,7 +109564,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="974">
+      <Item class="Part" referent="975">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109562,7 +109661,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="975">
+      <Item class="Part" referent="976">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109659,7 +109758,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="976">
+      <Item class="Part" referent="977">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109756,7 +109855,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="977">
+      <Item class="Part" referent="978">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109853,7 +109952,7 @@ return {
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="978">
+      <Item class="Part" referent="979">
         <Properties>
           <string name="Name">platform</string>
           <bool name="Anchored">true</bool>
@@ -109951,7 +110050,7 @@ return {
         </Properties>
       </Item>
     </Item>
-    <Item class="Terrain" referent="979">
+    <Item class="Terrain" referent="980">
       <Properties>
         <string name="Name">Terrain</string>
         <token name="AcquisitionMethod">0</token>
