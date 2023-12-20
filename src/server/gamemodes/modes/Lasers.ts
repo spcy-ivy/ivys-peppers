@@ -53,15 +53,21 @@ async function winCondition(): Promise<Player[]> {
 
 	lobbyVariant("flat");
 
-	for (let i = 0; i < 5; i++) {
-		task.wait(2);
-		obliterator.Add(createLaser());
-	}
+	obliterator.AddPromise(
+		Promise.each([1, 2, 3, 4, 5, 6], () => {
+			return Promise.delay(2).andThen(() => {
+				obliterator.Add(createLaser());
+			});
+		}),
+	);
+
+	obliterator.AddPromise(
+		Promise.delay(roundLength).andThen(() => {
+			endGame.Fire(...store.getState(selectSurvivors).asPtr());
+		}),
+	);
 
 	Events.startTimer.broadcast(roundLength);
-	task.wait(roundLength);
-
-	endGame.Fire(...store.getState(selectSurvivors).asPtr());
 
 	return endGamePromise;
 }
