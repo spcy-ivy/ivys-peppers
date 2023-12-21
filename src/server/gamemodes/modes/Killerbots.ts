@@ -4,6 +4,7 @@ import { store } from "server/store";
 import { selectSurvivors } from "server/store/survivors";
 import { promiseR6 } from "@rbxts/promise-character";
 import { Events } from "server/network";
+import { randomLobbyVariant } from "../helpers/randomLobbyVariant";
 
 const roundLength = 30;
 const missileTravelLength = 1;
@@ -115,6 +116,7 @@ async function winCondition(): Promise<Player[]> {
 		}),
 	);
 
+	randomLobbyVariant();
 	Events.startTimer.broadcast(roundLength);
 
 	return endGamePromise;
