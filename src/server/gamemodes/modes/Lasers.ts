@@ -1,10 +1,10 @@
 import { Events } from "server/network";
 import { initializeGamemode } from "../helpers/initializeGamemode";
-import { lobbyVariant } from "../helpers/lobbyVariant";
 import { store } from "server/store";
 import { selectSurvivors } from "server/store/survivors";
 import { TweenService, Workspace } from "@rbxts/services";
-import colorscheme from "shared/colorscheme";
+import { Dependency } from "@flamework/core";
+import { RoundManager } from "server/services/RoundManager";
 
 const roundLength = 30;
 const laserDamage = 10;
@@ -19,7 +19,7 @@ function createLaser() {
 	laser.Position = laser.CFrame.LookVector.mul(50);
 	laser.Anchored = true;
 	laser.CanCollide = false;
-	laser.Color = colorscheme.red;
+	laser.Color = Color3.fromRGB(168, 82, 71);
 	laser.Material = Enum.Material.Neon;
 
 	laser.Touched.Connect((other) =>
@@ -51,7 +51,7 @@ function createLaser() {
 async function winCondition(): Promise<Player[]> {
 	const [obliterator, endGame, endGamePromise] = initializeGamemode();
 
-	lobbyVariant("flat");
+	Dependency<RoundManager>().SetVariant("flat");
 
 	obliterator.AddPromise(
 		Promise.each([1, 2, 3, 4, 5, 6], () => {
