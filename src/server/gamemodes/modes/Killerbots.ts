@@ -7,7 +7,7 @@ import { Events } from "server/network";
 import { randomLobbyVariant } from "../helpers/randomLobbyVariant";
 
 const roundLength = 30;
-const missileTravelLength = 1;
+const missileTravelLength = 0.5;
 
 async function createMissile(player: Player, killerbot: Part) {
 	const model = player.Character || player.CharacterAdded.Wait()[0];
@@ -33,7 +33,13 @@ async function createMissile(player: Player, killerbot: Part) {
 		missile,
 		new TweenInfo(missileTravelLength, Enum.EasingStyle.Linear),
 		{
-			Position: rootpart.Position,
+			Position: rootpart.Position.add(
+				new Vector3(
+					math.random(-10, 10),
+					math.random(-10, 10),
+					math.random(-10, 10),
+				),
+			),
 		},
 	);
 
@@ -70,7 +76,7 @@ function createKillerbot() {
 
 	const loop = task.defer(() => {
 		for (;;) {
-			task.wait(2);
+			task.wait(1);
 
 			const tween = TweenService.Create(killerbot, new TweenInfo(1), {
 				Position: new Vector3(
