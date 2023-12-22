@@ -1,4 +1,4 @@
-import { TweenService, Workspace } from "@rbxts/services";
+import { ServerScriptService, TweenService, Workspace } from "@rbxts/services";
 import { initializeGamemode } from "../helpers/initializeGamemode";
 import { Dependency } from "@flamework/core";
 import { RoundManager } from "server/services/RoundManager";
@@ -6,12 +6,15 @@ import { store } from "server/store";
 import { selectSurvivors } from "server/store/survivors";
 import { Events } from "server/network";
 import colorscheme from "shared/colorscheme";
+import { promiseR6 } from "@rbxts/promise-character";
 
 const roundLength = 30;
 const partSize = 5;
 const fadeTime = 0.3;
 const respawnTime = 5;
 const startingPosition = new Vector3(-45 + partSize / 2, 1, -45 + partSize / 2);
+
+const nothing = ServerScriptService.Maps.nothing;
 
 async function winCondition(): Promise<Player[]> {
 	const [obliterator, endGame, endGamePromise] = initializeGamemode();
@@ -24,7 +27,12 @@ async function winCondition(): Promise<Player[]> {
 			const part = new Instance("Part");
 			part.Anchored = true;
 			part.Size = new Vector3(partSize, 1, partSize);
-			part.Color = colorscheme.lighter_background;
+
+			if (y % 2 === 0 || x % 2 === 0) {
+				part.Color = colorscheme.background;
+			} else {
+				part.Color = colorscheme.lighter_background;
+			}
 
 			part.TopSurface = Enum.SurfaceType.Smooth;
 			part.BottomSurface = Enum.SurfaceType.Smooth;
@@ -71,13 +79,19 @@ async function winCondition(): Promise<Player[]> {
 	obliterator.Add(map);
 
 	map.Parent = Workspace;
-	Dependency<RoundManager>().SetVariant("nothing");
+	Dependency<RoundManager>().LoadAlternativeMap(nothing);
 
 	store
 		.getState(selectSurvivors)
 		.iter()
-		.forEach((player) => {
-			player.Character?.PivotTo(new CFrame(Vector3.yAxis.mul(10)));
+		.forEach(async (player) => {
+			const model = player.Character || player.CharacterAdded.Wait()[0];
+			const character = await promiseR6(model);
+
+			character.PivotTo(new CFrame(Vector3.yAxis.mul(10)));
+			character.HumanoidRootPart.Anchored = true;
+			task.wait(3);
+			character.HumanoidRootPart.Anchored = false;
 		});
 
 	Events.startTimer.broadcast(roundLength);
