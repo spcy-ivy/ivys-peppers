@@ -3,9 +3,10 @@ import { initializeGamemode } from "../helpers/initializeGamemode";
 import { store } from "server/store";
 import { selectSurvivors } from "server/store/survivors";
 import { promiseR6 } from "@rbxts/promise-character";
-import { alternativeMap } from "../helpers/alternativeMap";
 import Log from "@rbxts/log";
 import { Events } from "server/network";
+import { Dependency } from "@flamework/core";
+import { RoundManager } from "server/services/RoundManager";
 
 const roundLength = 30;
 const hammer = ServerScriptService.Tools.hammer;
@@ -32,7 +33,7 @@ async function winCondition(): Promise<Player[]> {
 		endGame.Fire();
 	}
 
-	const clone = alternativeMap(variantModel);
+	const clone = Dependency<RoundManager>().LoadAlternativeMap(variantModel);
 	const timezone = clone.FindFirstChild("timezone") as BasePart;
 
 	store
