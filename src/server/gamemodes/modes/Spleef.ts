@@ -9,7 +9,7 @@ import colorscheme from "shared/colorscheme";
 import { promiseR6 } from "@rbxts/promise-character";
 
 const roundLength = 30;
-const partSize = 5;
+const partSize = 7.5;
 const fadeTime = 0.3;
 const respawnTime = 5;
 const startingPosition = new Vector3(-45 + partSize / 2, 1, -45 + partSize / 2);
@@ -28,7 +28,7 @@ async function winCondition(): Promise<Player[]> {
 			part.Anchored = true;
 			part.Size = new Vector3(partSize, 1, partSize);
 
-			if (y % 2 === 0 || x % 2 === 0) {
+			if (x % 2 === 0) {
 				part.Color = colorscheme.background;
 			} else {
 				part.Color = colorscheme.lighter_background;
