@@ -5,6 +5,7 @@ import KingOfTheHill from "server/gamemodes/modes/KingOfTheHill";
 import Lasers from "server/gamemodes/modes/Lasers";
 import Killerbots from "server/gamemodes/modes/Killerbots";
 import Spleef from "server/gamemodes/modes/Spleef";
+import FloodEscape from "server/gamemodes/modes/FloodEscape";
 
 export const gamemodes = {
 	// test_mode: TestMode,
@@ -14,4 +15,5 @@ export const gamemodes = {
 	lasers: Lasers,
 	killerbots: Killerbots,
 	spleef: Spleef,
+	flood_escape: FloodEscape,
 };
