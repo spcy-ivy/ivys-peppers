@@ -103265,42 +103265,6 @@ return Symbol</string>
         </Item>
         <Item class="Model" referent="865">
           <Properties>
-            <string name="Name">nothing</string>
-            <BinaryString name="AttributesSerialize"></BinaryString>
-            <bool name="DefinesCapabilities">false</bool>
-            <token name="LevelOfDetail">0</token>
-            <CoordinateFrame name="ModelMeshCFrame">
-              <X>0</X>
-              <Y>0</Y>
-              <Z>0</Z>
-              <R00>1</R00>
-              <R01>0</R01>
-              <R02>0</R02>
-              <R10>0</R10>
-              <R11>1</R11>
-              <R12>0</R12>
-              <R20>0</R20>
-              <R21>0</R21>
-              <R22>1</R22>
-            </CoordinateFrame>
-            <SharedString name="ModelMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
-            <Vector3 name="ModelMeshSize">
-              <X>0</X>
-              <Y>0</Y>
-              <Z>0</Z>
-            </Vector3>
-            <token name="ModelStreamingMode">0</token>
-            <bool name="NeedsPivotMigration">false</bool>
-            <Ref name="PrimaryPart">null</Ref>
-            <float name="ScaleFactor">1</float>
-            <int64 name="SourceAssetId">-1</int64>
-            <BinaryString name="Tags"></BinaryString>
-            <OptionalCoordinateFrame name="WorldPivotData">
-            </OptionalCoordinateFrame>
-          </Properties>
-        </Item>
-        <Item class="Model" referent="866">
-          <Properties>
             <string name="Name">truss_playground</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
             <bool name="DefinesCapabilities">false</bool>
@@ -103348,7 +103312,7 @@ return Symbol</string>
               </CFrame>
             </OptionalCoordinateFrame>
           </Properties>
-          <Item class="Part" referent="867">
+          <Item class="Part" referent="866">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -103445,7 +103409,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Part" referent="868">
+          <Item class="Part" referent="867">
             <Properties>
               <string name="Name">plate</string>
               <bool name="Anchored">true</bool>
@@ -103541,7 +103505,7 @@ return Symbol</string>
                 <Z>0</Z>
               </Vector3>
             </Properties>
-            <Item class="Texture" referent="869">
+            <Item class="Texture" referent="868">
               <Properties>
                 <string name="Name">Texture</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -103566,7 +103530,7 @@ return Symbol</string>
               </Properties>
             </Item>
           </Item>
-          <Item class="Part" referent="870">
+          <Item class="Part" referent="869">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -103663,7 +103627,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Part" referent="871">
+          <Item class="Part" referent="870">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -103760,7 +103724,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Part" referent="872">
+          <Item class="Part" referent="871">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -103857,7 +103821,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Part" referent="873">
+          <Item class="Part" referent="872">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -103954,7 +103918,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Part" referent="874">
+          <Item class="Part" referent="873">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -104051,7 +104015,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Part" referent="875">
+          <Item class="Part" referent="874">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -104148,7 +104112,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Part" referent="876">
+          <Item class="Part" referent="875">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -104245,7 +104209,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Part" referent="877">
+          <Item class="Part" referent="876">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -104342,7 +104306,7 @@ return Symbol</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="TrussPart" referent="878">
+          <Item class="TrussPart" referent="877">
             <Properties>
               <string name="Name">truss</string>
               <bool name="Anchored">true</bool>
@@ -104438,7 +104402,7 @@ return Symbol</string>
               <token name="style">0</token>
             </Properties>
           </Item>
-          <Item class="TrussPart" referent="879">
+          <Item class="TrussPart" referent="878">
             <Properties>
               <string name="Name">truss</string>
               <bool name="Anchored">true</bool>
@@ -104534,7 +104498,7 @@ return Symbol</string>
               <token name="style">0</token>
             </Properties>
           </Item>
-          <Item class="TrussPart" referent="880">
+          <Item class="TrussPart" referent="879">
             <Properties>
               <string name="Name">truss</string>
               <bool name="Anchored">true</bool>
@@ -104630,7 +104594,7 @@ return Symbol</string>
               <token name="style">0</token>
             </Properties>
           </Item>
-          <Item class="TrussPart" referent="881">
+          <Item class="TrussPart" referent="880">
             <Properties>
               <string name="Name">truss</string>
               <bool name="Anchored">true</bool>
@@ -104726,7 +104690,7 @@ return Symbol</string>
               <token name="style">0</token>
             </Properties>
           </Item>
-          <Item class="Part" referent="882">
+          <Item class="Part" referent="881">
             <Properties>
               <string name="Name">platform</string>
               <bool name="Anchored">true</bool>
@@ -104824,6 +104788,42 @@ return Symbol</string>
             </Properties>
           </Item>
         </Item>
+      </Item>
+      <Item class="Model" referent="882">
+        <Properties>
+          <string name="Name">nothing</string>
+          <BinaryString name="AttributesSerialize"></BinaryString>
+          <bool name="DefinesCapabilities">false</bool>
+          <token name="LevelOfDetail">0</token>
+          <CoordinateFrame name="ModelMeshCFrame">
+            <X>0</X>
+            <Y>0</Y>
+            <Z>0</Z>
+            <R00>1</R00>
+            <R01>0</R01>
+            <R02>0</R02>
+            <R10>0</R10>
+            <R11>1</R11>
+            <R12>0</R12>
+            <R20>0</R20>
+            <R21>0</R21>
+            <R22>1</R22>
+          </CoordinateFrame>
+          <SharedString name="ModelMeshData">rxNJufX5oaagQE3qNtzJSQ==</SharedString>
+          <Vector3 name="ModelMeshSize">
+            <X>0</X>
+            <Y>0</Y>
+            <Z>0</Z>
+          </Vector3>
+          <token name="ModelStreamingMode">0</token>
+          <bool name="NeedsPivotMigration">false</bool>
+          <Ref name="PrimaryPart">null</Ref>
+          <float name="ScaleFactor">1</float>
+          <int64 name="SourceAssetId">-1</int64>
+          <BinaryString name="Tags"></BinaryString>
+          <OptionalCoordinateFrame name="WorldPivotData">
+          </OptionalCoordinateFrame>
+        </Properties>
       </Item>
     </Item>
     <Item class="Folder" referent="883">
@@ -105407,6 +105407,7 @@ return winCondition
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 local Flamework = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@flamework", "core", "out").Flamework
 local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
+local ServerScriptService = _services.ServerScriptService
 local TweenService = _services.TweenService
 local Workspace = _services.Workspace
 local initializeGamemode = TS.import(script, game:GetService("ServerScriptService"), "TS", "gamemodes", "helpers", "initializeGamemode").initializeGamemode
@@ -105414,11 +105415,13 @@ local store = TS.import(script, game:GetService("ServerScriptService"), "TS", "s
 local selectSurvivors = TS.import(script, game:GetService("ServerScriptService"), "TS", "store", "survivors").selectSurvivors
 local Events = TS.import(script, game:GetService("ServerScriptService"), "TS", "network").Events
 local colorscheme = TS.import(script, game:GetService("ReplicatedStorage"), "TS", "colorscheme")
+local promiseR6 = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "promise-character").promiseR6
 local roundLength = 30
 local partSize = 5
 local fadeTime = 0.3
 local respawnTime = 5
 local startingPosition = Vector3.new(-45 + partSize / 2, 1, -45 + partSize / 2)
+local nothing = ServerScriptService.Maps.nothing
 local winCondition = TS.async(function()
 	local _binding = initializeGamemode()
 	local obliterator = _binding[1]
@@ -105453,7 +105456,11 @@ local winCondition = TS.async(function()
 					local part = Instance.new("Part")
 					part.Anchored = true
 					part.Size = Vector3.new(partSize, 1, partSize)
-					part.Color = colorscheme.lighter_background
+					if y % 2 == 0 or x % 2 == 0 then
+						part.Color = colorscheme.background
+					else
+						part.Color = colorscheme.lighter_background
+					end
 					part.TopSurface = Enum.SurfaceType.Smooth
 					part.BottomSurface = Enum.SurfaceType.Smooth
 					part.Position = Vector3.new(startingPosition.X + x * partSize, 1, startingPosition.Z + y * partSize)
@@ -105482,13 +105489,15 @@ local winCondition = TS.async(function()
 	end))
 	obliterator:Add(map)
 	map.Parent = Workspace;
-	(Flamework.resolveDependency("server/services/RoundManager@RoundManager")):SetVariant("nothing")
-	store:getState(selectSurvivors):iter():forEach(function(player)
-		local _result = player.Character
-		if _result ~= nil then
-			_result:PivotTo(CFrame.new(Vector3.yAxis * 10))
-		end
-	end)
+	(Flamework.resolveDependency("server/services/RoundManager@RoundManager")):LoadAlternativeMap(nothing)
+	store:getState(selectSurvivors):iter():forEach(TS.async(function(player)
+		local model = player.Character or (player.CharacterAdded:Wait())
+		local character = TS.await(promiseR6(model))
+		character:PivotTo(CFrame.new(Vector3.yAxis * 10))
+		character.HumanoidRootPart.Anchored = true
+		task.wait(3)
+		character.HumanoidRootPart.Anchored = false
+	end))
 	Events.startTimer:broadcast(roundLength)
 	return endGamePromise
 end)

@@ -10,6 +10,7 @@ interface ServerScriptService {
 		nothing: Model;
 		lobby_variants: Folder;
 		KOTH: Folder;
+		flood_escape: Folder;
 	};
 }
 

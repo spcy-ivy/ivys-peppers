@@ -16,6 +16,8 @@ have fun adding your own stuff ^-^
 
 oh ya, if ur making ur fork, keep in mind we use a [attribution sharealike creative commons license](https://creativecommons.org/licenses/by-sa/4.0/). the requirements shouldnt be too restricting, but if you have any problems feel free to contact me
 
+and if you're using ANY artwork from the game for any purpose, please credit @pnmpki! they are a very talented artist and would like if they got credited (if u especially like the art, you cant give money to them directly, so we'll add a method here once it comes)
+
 # tools
 ## disclaimer!!!
 dont get confused when I use react shit with @rbxts/roact its based off of [this](https://github.com/littensy/rbxts-react-example/) and apparently its to avoid conflicts w/ rbxts compiler
