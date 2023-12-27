@@ -28,7 +28,7 @@ async function winCondition(): Promise<Player[]> {
 			part.Anchored = true;
 			part.Size = new Vector3(partSize, 1, partSize);
 
-			if (x % 2 === 0) {
+			if ((x + y) % 2 === 0) {
 				part.Color = colorscheme.background;
 			} else {
 				part.Color = colorscheme.lighter_background;

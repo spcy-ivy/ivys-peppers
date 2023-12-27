@@ -1,7 +1,7 @@
 import { Players, PhysicsService } from "@rbxts/services";
 import { OnStart, Service } from "@flamework/core";
 
-const group = "Players";
+const group = "Player";
 
 @Service()
 export class NoPlayerCollision implements OnStart {
